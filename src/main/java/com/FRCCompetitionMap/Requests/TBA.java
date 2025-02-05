@@ -78,12 +78,22 @@ public abstract class TBA {
     }
 
     /**
-     * Searches for the playoff alliances chosen in an event at a specific year.
+     * Searches for the playoff alliances chosen in an event.
      * @param year Year of the event (ie. 2024)
      * @param event Event code (ie. onnob (North Bay))
-     * @return Response code and JSON containing alliance information (ie. {200, ...})
+     * @return Response code and JSON containing alliance information.
      */
     public static String[] searchAlliances(int year, String event) {
         return TBA.get("/event/" + year + event + "/alliances");
+    }
+
+    /**
+     * Searches for the basic information of the teams involved in an event.
+     * @param year Year of the event (ie. 2024)
+     * @param event Event code (ie. onnob (North Bay))
+     * @return Response code and JSON containing team information.
+     */
+    public static String[] searchTeamsSimple(int year, String event) {
+        return TBA.get("/event/" + year + event + "/teams/simple");
     }
 }
