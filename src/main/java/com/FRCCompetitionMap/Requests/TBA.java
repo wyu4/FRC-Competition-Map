@@ -63,8 +63,27 @@ public abstract class TBA {
 
         return new String[] {String.valueOf(responseCode), result.toString()};
     }
+//
+//    public static String[] searchDistrict(int team) {
+//        return TBA.get("/team/frc" + team + "/districts");
+//    }
 
-    public static void main(String[] args) throws Exception {
-//        System.out.println(Arrays.toString(TBA.get("/team/frc7476")));
+    /**
+     * Search all events that a team has participated in.
+     * @param team Team number (ie. 7476)
+     * @return The event data of all the events that the team has participated in.
+     */
+    public static String[] searchEvents(int team) {
+        return TBA.get("/team/frc" + team + "/events");
+    }
+
+    /**
+     * Searches for the playoff alliances chosen in an event at a specific year.
+     * @param year Year of the event (ie. 2024)
+     * @param event Event code (ie. onnob (North Bay))
+     * @return Json containing alliance information.
+     */
+    public static String[] searchAlliances(int year, String event) {
+        return TBA.get("/event/" + year + event + "/alliances");
     }
 }
