@@ -71,7 +71,7 @@ public abstract class TBA {
     /**
      * Search all events that a team has participated in.
      * @param team Team number (ie. 7476)
-     * @return The event data of all the events that the team has participated in.
+     * @return Response code and the event data of all the events that the team has participated in (ie. {200, ...}).
      */
     public static String[] searchEvents(int team) {
         return TBA.get("/team/frc" + team + "/events");
@@ -81,7 +81,7 @@ public abstract class TBA {
      * Searches for the playoff alliances chosen in an event at a specific year.
      * @param year Year of the event (ie. 2024)
      * @param event Event code (ie. onnob (North Bay))
-     * @return Json containing alliance information.
+     * @return Response code and JSON containing alliance information (ie. {200, ...})
      */
     public static String[] searchAlliances(int year, String event) {
         return TBA.get("/event/" + year + event + "/alliances");

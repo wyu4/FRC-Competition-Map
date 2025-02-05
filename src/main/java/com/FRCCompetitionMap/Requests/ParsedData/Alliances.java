@@ -1,26 +1,34 @@
 package com.FRCCompetitionMap.Requests.ParsedData;
 
-import com.google.gson.Gson;
+import com.FRCCompetitionMap.Requests.DataParser;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Alliances {
-    private static final Gson PARSER = new Gson();
-
-    private List<Alliance> alliances = new ArrayList<>();
+    private ArrayList<Alliance> alliances = new ArrayList<>();
 
     public Alliances(String json) {
-        List<LinkedTreeMap<String, Object>> allianceData = PARSER.fromJson(json, List.class);
+        ArrayList<?> allianceData = DataParser.PARSER.fromJson(json, ArrayList.class);
 
-        for (LinkedTreeMap<String, Object> data : allianceData) {
-            System.out.println(data);
-            alliances.add(PARSER.fromJson(data.toString(), Alliance.class));
+        for (Object data : allianceData) {
+            if (data instanceof LinkedTreeMap<?,?>) {
+                alliances.add(new Alliance((LinkedTreeMap<?,?>) data));
+            }
         }
     }
 
     public Alliance getAlliance(int number) {
         return alliances.get(number);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder(getClass().toString());
+        builder.append("{");
+        for (Alliance alliance : alliances) {
+            builder.append("\n").append(alliance);
+        }
+        return builder.append("\n}").toString();
     }
 }
