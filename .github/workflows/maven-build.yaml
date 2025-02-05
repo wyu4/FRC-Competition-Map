@@ -22,4 +22,4 @@ jobs:
 
       - name: List Files
         run: |
-          tree /F
+          tree /A /F
