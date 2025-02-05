@@ -1,4 +1,4 @@
-name: GitHub Maven Build Test
+name: Maven Build
 
 on:
   push:
@@ -20,8 +20,6 @@ jobs:
       - name: Build Maven Project
         run: mvn -B clean package --file pom.xml
 
-      - name: STEP 4 - List Files
+      - name: List Files
         run: |
-          Get-ChildItem -Force
-          cd target
-          Get-ChildItem -Force
+          tree /F
