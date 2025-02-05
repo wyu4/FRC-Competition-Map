@@ -3,39 +3,32 @@ Maps out the current team hierarchy of FRC competitions. This was made for the I
 
 ## Repository Tree
 ```text
+│   .gitignore
+│   dependency-reduced-pom.xml
+│   LICENSE
+│   pom.xml
+│   README.md
+│
 ├───.github
 │   └───workflows
-├───.idea
-│   └───libraries
+│           maven-build.yaml
+│
 ├───src
 │   ├───main
 │   │   ├───java
 │   │   │   └───com
 │   │   │       └───FRCCompetitionMap
+│   │   │           │   Start.java
+│   │   │           │
 │   │   │           └───Requests
+│   │   │                   TBA.java
+│   │   │
 │   │   └───resources
 │   └───test
 │       ├───java
 │       └───resources
-└───target
-    ├───classes
-    │   └───com
-    │       └───FRCCompetitionMap
-    │           └───Requests
-    ├───generated-sources
-    │   └───annotations
-    ├───generated-test-sources
-    │   └───test-annotations
-    ├───maven-archiver
-    ├───maven-status
-    │   └───maven-compiler-plugin
-    │       ├───compile
-    │       │   └───default-compile
-    │       └───testCompile
-    │           └───default-testCompile
-    └───test-classes
 ```
-Using the following command:
+Generated using the following command:
 ```bash
-tree
+tree /F
 ```
