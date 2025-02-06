@@ -1,0 +1,772 @@
+{
+    "Matches": [
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Match 1 (R1)",
+            "matchNumber": 1,
+            "scoreRedFinal": 78,
+            "scoreRedFoul": 2,
+            "scoreRedAuto": 29,
+            "scoreBlueFinal": 65,
+            "scoreBlueFoul": 25,
+            "scoreBlueAuto": 14,
+            "autoStartTime": "2024-03-24T14:47:51.423",
+            "actualStartTime": "2024-03-24T14:47:51.423",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T14:51:16.77",
+            "teams": [
+                {
+                    "teamNumber": 4039,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 8731,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 865,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 7476,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 7480,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 6110,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Match 2 (R1)",
+            "matchNumber": 2,
+            "scoreRedFinal": 80,
+            "scoreRedFoul": 7,
+            "scoreRedAuto": 31,
+            "scoreBlueFinal": 44,
+            "scoreBlueFoul": 10,
+            "scoreBlueAuto": 9,
+            "autoStartTime": "2024-03-24T14:58:17.56",
+            "actualStartTime": "2024-03-24T14:58:17.56",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T15:03:52.313",
+            "teams": [
+                {
+                    "teamNumber": 2706,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 6864,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 2935,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 5885,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 2708,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 6859,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Match 3 (R1)",
+            "matchNumber": 3,
+            "scoreRedFinal": 63,
+            "scoreRedFoul": 0,
+            "scoreRedAuto": 28,
+            "scoreBlueFinal": 66,
+            "scoreBlueFoul": 5,
+            "scoreBlueAuto": 26,
+            "autoStartTime": "2024-03-24T15:09:02.11",
+            "actualStartTime": "2024-03-24T15:09:02.11",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T15:17:26.777",
+            "teams": [
+                {
+                    "teamNumber": 1334,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 4152,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 5409,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 2013,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1310,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 8729,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Match 4 (R1)",
+            "matchNumber": 4,
+            "scoreRedFinal": 92,
+            "scoreRedFoul": 20,
+            "scoreRedAuto": 29,
+            "scoreBlueFinal": 62,
+            "scoreBlueFoul": 7,
+            "scoreBlueAuto": 22,
+            "autoStartTime": "2024-03-24T15:22:21.71",
+            "actualStartTime": "2024-03-24T15:22:21.71",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T15:25:47.89",
+            "teams": [
+                {
+                    "teamNumber": 3543,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 4343,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1305,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 6514,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 781,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 4069,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Match 5 (R2)",
+            "matchNumber": 5,
+            "scoreRedFinal": 49,
+            "scoreRedFoul": 0,
+            "scoreRedAuto": 19,
+            "scoreBlueFinal": 28,
+            "scoreBlueFoul": 2,
+            "scoreBlueAuto": 7,
+            "autoStartTime": "2024-03-24T15:31:18.543",
+            "actualStartTime": "2024-03-24T15:31:18.543",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T15:34:33.323",
+            "teams": [
+                {
+                    "teamNumber": 6110,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 7480,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 7476,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 5885,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 2708,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 6859,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Match 6 (R2)",
+            "matchNumber": 6,
+            "scoreRedFinal": 85,
+            "scoreRedFoul": 0,
+            "scoreRedAuto": 23,
+            "scoreBlueFinal": 69,
+            "scoreBlueFoul": 0,
+            "scoreBlueAuto": 27,
+            "autoStartTime": "2024-03-24T15:46:07.503",
+            "actualStartTime": "2024-03-24T15:46:07.503",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T15:49:40.207",
+            "teams": [
+                {
+                    "teamNumber": 1334,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 4152,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 5409,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 6514,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 781,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 4069,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Match 7 (R2)",
+            "matchNumber": 7,
+            "scoreRedFinal": 87,
+            "scoreRedFoul": 0,
+            "scoreRedAuto": 39,
+            "scoreBlueFinal": 70,
+            "scoreBlueFoul": 0,
+            "scoreBlueAuto": 24,
+            "autoStartTime": "2024-03-24T15:53:40.07",
+            "actualStartTime": "2024-03-24T15:53:40.07",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T15:57:03.517",
+            "teams": [
+                {
+                    "teamNumber": 4039,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 8731,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 865,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 2935,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 6864,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 2706,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Match 8 (R2)",
+            "matchNumber": 8,
+            "scoreRedFinal": 79,
+            "scoreRedFoul": 20,
+            "scoreRedAuto": 16,
+            "scoreBlueFinal": 71,
+            "scoreBlueFoul": 0,
+            "scoreBlueAuto": 34,
+            "autoStartTime": "2024-03-24T16:01:17.917",
+            "actualStartTime": "2024-03-24T16:01:17.917",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T16:04:41.2",
+            "teams": [
+                {
+                    "teamNumber": 8729,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1310,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 2013,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 3543,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1305,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 4343,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Match 9 (R3)",
+            "matchNumber": 9,
+            "scoreRedFinal": 69,
+            "scoreRedFoul": 5,
+            "scoreRedAuto": 24,
+            "scoreBlueFinal": 98,
+            "scoreBlueFoul": 12,
+            "scoreBlueAuto": 23,
+            "autoStartTime": "2024-03-24T16:18:32.063",
+            "actualStartTime": "2024-03-24T16:18:32.063",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T16:21:50.897",
+            "teams": [
+                {
+                    "teamNumber": 2706,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 6864,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 2935,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 5409,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 4152,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1334,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Match 10 (R3)",
+            "matchNumber": 10,
+            "scoreRedFinal": 68,
+            "scoreRedFoul": 0,
+            "scoreRedAuto": 29,
+            "scoreBlueFinal": 53,
+            "scoreBlueFoul": 0,
+            "scoreBlueAuto": 17,
+            "autoStartTime": "2024-03-24T16:28:23.723",
+            "actualStartTime": "2024-03-24T16:28:23.723",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T16:31:37.503",
+            "teams": [
+                {
+                    "teamNumber": 4343,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 3543,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1305,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 7476,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 7480,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 6110,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Match 11 (R4)",
+            "matchNumber": 11,
+            "scoreRedFinal": 84,
+            "scoreRedFoul": 0,
+            "scoreRedAuto": 34,
+            "scoreBlueFinal": 53,
+            "scoreBlueFoul": 0,
+            "scoreBlueAuto": 31,
+            "autoStartTime": "2024-03-24T16:40:22.897",
+            "actualStartTime": "2024-03-24T16:40:22.897",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T16:43:34.027",
+            "teams": [
+                {
+                    "teamNumber": 4039,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 8731,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 865,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 2013,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1310,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 8729,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Match 12 (R4)",
+            "matchNumber": 12,
+            "scoreRedFinal": 79,
+            "scoreRedFoul": 0,
+            "scoreRedAuto": 24,
+            "scoreBlueFinal": 76,
+            "scoreBlueFoul": 5,
+            "scoreBlueAuto": 25,
+            "autoStartTime": "2024-03-24T16:49:44.783",
+            "actualStartTime": "2024-03-24T16:49:44.783",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T16:54:55.037",
+            "teams": [
+                {
+                    "teamNumber": 4343,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 3543,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1305,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 5409,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 4152,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1334,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Match 13 (R5)",
+            "matchNumber": 13,
+            "scoreRedFinal": 51,
+            "scoreRedFoul": 0,
+            "scoreRedAuto": 16,
+            "scoreBlueFinal": 70,
+            "scoreBlueFoul": 5,
+            "scoreBlueAuto": 24,
+            "autoStartTime": "2024-03-24T17:16:06.137",
+            "actualStartTime": "2024-03-24T17:16:06.137",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T17:21:39.667",
+            "teams": [
+                {
+                    "teamNumber": 8729,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1310,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 2013,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1305,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 3543,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 4343,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": true,
+            "matchVideoLink": null,
+            "description": "Final 1",
+            "matchNumber": 14,
+            "scoreRedFinal": 90,
+            "scoreRedFoul": 2,
+            "scoreRedAuto": 39,
+            "scoreBlueFinal": 92,
+            "scoreBlueFoul": 15,
+            "scoreBlueAuto": 29,
+            "autoStartTime": "2024-03-24T17:50:55.957",
+            "actualStartTime": "2024-03-24T17:50:55.957",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T17:54:54.377",
+            "teams": [
+                {
+                    "teamNumber": 4039,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 8731,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 865,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1305,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 3543,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 4343,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Final 2",
+            "matchNumber": 15,
+            "scoreRedFinal": 86,
+            "scoreRedFoul": 2,
+            "scoreRedAuto": 34,
+            "scoreBlueFinal": 68,
+            "scoreBlueFoul": 0,
+            "scoreBlueAuto": 29,
+            "autoStartTime": "2024-03-24T18:16:00.663",
+            "actualStartTime": "2024-03-24T18:16:00.663",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T18:21:32.487",
+            "teams": [
+                {
+                    "teamNumber": 4039,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 8731,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 865,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1305,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 3543,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 4343,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        },
+        {
+            "isReplay": false,
+            "matchVideoLink": null,
+            "description": "Final Tiebreaker",
+            "matchNumber": 16,
+            "scoreRedFinal": 83,
+            "scoreRedFoul": 5,
+            "scoreRedAuto": 34,
+            "scoreBlueFinal": 60,
+            "scoreBlueFoul": 0,
+            "scoreBlueAuto": 29,
+            "autoStartTime": "2024-03-24T18:33:24.697",
+            "actualStartTime": "2024-03-24T18:33:24.697",
+            "tournamentLevel": "Playoff",
+            "postResultTime": "2024-03-24T18:36:45.233",
+            "teams": [
+                {
+                    "teamNumber": 4039,
+                    "station": "Red1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 8731,
+                    "station": "Red2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 865,
+                    "station": "Red3",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 1305,
+                    "station": "Blue1",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 3543,
+                    "station": "Blue2",
+                    "dq": false
+                },
+                {
+                    "teamNumber": 4343,
+                    "station": "Blue3",
+                    "dq": false
+                }
+            ]
+        }
+    ]
+}
