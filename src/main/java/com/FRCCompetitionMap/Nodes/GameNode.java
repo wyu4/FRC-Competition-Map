@@ -24,4 +24,5 @@ public class GameNode extends DefaultGraphCell {
     public void setOpaque(boolean opaque) {
         GraphConstants.setOpaque(getAttributes(), opaque);
     }
+
 }

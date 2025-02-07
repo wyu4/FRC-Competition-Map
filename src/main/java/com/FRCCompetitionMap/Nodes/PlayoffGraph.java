@@ -1,17 +1,9 @@
 package com.FRCCompetitionMap.Nodes;
 
-import com.mxgraph.layout.mxCircleLayout;
-import com.mxgraph.layout.mxCompactTreeLayout;
-import com.mxgraph.layout.mxIGraphLayout;
-import com.mxgraph.util.mxCellRenderer;
 import org.jgraph.JGraph;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.DefaultGraphModel;
 import org.jgraph.graph.GraphModel;
-import org.jgrapht.Graph;
-import org.jgrapht.ext.JGraphXAdapter;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
