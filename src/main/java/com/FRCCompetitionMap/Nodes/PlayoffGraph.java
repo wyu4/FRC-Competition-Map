@@ -3,23 +3,20 @@ package com.FRCCompetitionMap.Nodes;
 import org.jgraph.JGraph;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.DefaultGraphModel;
-import org.jgraph.graph.GraphModel;
+import org.jgraph.graph.GraphLayoutCache;
 
-import javax.imageio.ImageIO;
-import javax.swing.JPanel;
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.File;
+import javax.swing.JFrame;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayoffGraph extends JPanel {
-    private final GraphModel model = new DefaultGraphModel();
-    private final JGraph graph = new JGraph(model);
+public class PlayoffGraph extends DefaultGraphModel {
+    private final JGraph graph;
     private final List<DefaultGraphCell> cells = new ArrayList<>();
 
     public PlayoffGraph() {
+        graph = new JGraph(this);
         graph.setCloneable(false);
         graph.setEditable(false);
     }
@@ -31,15 +28,33 @@ public class PlayoffGraph extends JPanel {
         cells.add(cell);
     }
 
-    public void connectCell(GameNode cell1, GameNode cell2) {
-        addCell(cell1); addCell(cell2);
+    public DefaultGraphCell[] getCells() {
+        return cells.toArray(DefaultGraphCell[]::new);
     }
 
     public void render() {
         graph.getGraphLayoutCache().insert(cells);
     }
 
-    public static void main(String[] args) throws IOException {
+    public JGraph getGraph() {
+        return graph;
+    }
 
+    public static void main(String[] args) throws IOException {
+        JFrame frame = new JFrame("JGraph Test");
+        frame.setLayout(new GridLayout(1, 1));
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        PlayoffGraph graph = new PlayoffGraph();
+
+        GameNode testNode1 = new GameNode("Snowberry rocks");
+        testNode1.setBounds(100, 100, 100, 100);
+        graph.addCell(testNode1);
+        graph.render();
+
+        frame.add(graph.getGraph());
+        frame.setVisible(true);
+        frame.revalidate();
+        frame.repaint();
     }
 }
