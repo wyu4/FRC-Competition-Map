@@ -19,10 +19,12 @@ public class PlayoffGraph extends DefaultGraphModel {
         graph = new JGraph(this);
         graph.setCloneable(false);
         graph.setEditable(false);
+        graph.setDragEnabled(false);
+        graph.setMoveable(false);
     }
 
     public void addCell(GameNode cell) {
-        if (!cells.contains(cell)) {
+        if (cells.contains(cell)) {
             return;
         }
         cells.add(cell);
@@ -33,7 +35,7 @@ public class PlayoffGraph extends DefaultGraphModel {
     }
 
     public void render() {
-        graph.getGraphLayoutCache().insert(cells);
+        graph.getGraphLayoutCache().insert(cells.toArray());
     }
 
     public JGraph getGraph() {

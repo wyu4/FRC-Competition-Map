@@ -21,6 +21,10 @@ public class GameNode extends DefaultGraphCell {
                 new Rectangle2D.Double(x, y, w, h));
     }
 
+    public Rectangle2D getBounds() {
+        return GraphConstants.getBounds(getAttributes());
+    }
+
     public void setBackground(Color bg) {
         GraphConstants.setGradientColor(getAttributes(), bg);
     }
