@@ -76,7 +76,7 @@ public class PlayoffMatch {
 
     @Override
     public String toString() {
-        return getDescription();
+        return "\"" + getDescription() + "\"";
     }
 
     public static void main(String[] args) {

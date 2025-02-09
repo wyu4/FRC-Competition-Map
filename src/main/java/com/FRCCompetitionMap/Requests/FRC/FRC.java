@@ -24,7 +24,7 @@ public class FRC {
     }
 
 
-    public static String[] get(String endpoint) {
+    public static String[] get(String endpoint, String defaultValue) {
         URL url;
         try {
             url = URI.create(API + endpoint).toURL();
@@ -47,18 +47,18 @@ public class FRC {
                     new InputStreamReader(connection.getInputStream()));
             String nextLine;
             while ((nextLine = input.readLine()) != null) {
-                result.append(nextLine).append("\n");
+                result.append(nextLine);
             }
 
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            result = new StringBuilder("{}");
+            result = new StringBuilder(defaultValue);
         }
 
         return new String[] {String.valueOf(responseCode), result.toString()};
     }
 
-    public static String[] searchPlayoffBracket(int season, String event) {
-        return get("/" + season + "/matches/" + event + "?tournamentLevel=Playoff");
+    public static String[] searchPlayoffBracket(int season, String event, String defaultValue) {
+        return get("/" + season + "/matches/" + event + "?tournamentLevel=Playoff", defaultValue);
     }
 }
