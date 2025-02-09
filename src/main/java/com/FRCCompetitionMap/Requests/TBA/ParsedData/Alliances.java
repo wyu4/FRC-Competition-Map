@@ -1,4 +1,4 @@
-package com.FRCCompetitionMap.Requests.ParsedData;
+package com.FRCCompetitionMap.Requests.TBA.ParsedData;
 
 import com.FRCCompetitionMap.Requests.DataParser;
 import com.google.gson.internal.LinkedTreeMap;

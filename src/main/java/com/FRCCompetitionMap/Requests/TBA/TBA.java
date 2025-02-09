@@ -1,4 +1,4 @@
-package com.FRCCompetitionMap.Requests;
+package com.FRCCompetitionMap.Requests.TBA;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 
 /**

@@ -1,4 +1,4 @@
-package com.FRCCompetitionMap.Requests;
+package com.FRCCompetitionMap.Requests.FRC;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Base64;
 
 /**
  * Class that handles HTTP Requests to the FRC API.
@@ -18,8 +19,8 @@ public class FRC {
     private static final String API = "https://frc-api.firstinspires.org/v3.0";
     private static String AUTH;
 
-    public static void setAuth(String auth) {
-        AUTH = auth;
+    public static void setAuth(String username, String token) {
+        AUTH = Base64.getEncoder().encodeToString((username + ":" + token).getBytes());
     }
 
 
