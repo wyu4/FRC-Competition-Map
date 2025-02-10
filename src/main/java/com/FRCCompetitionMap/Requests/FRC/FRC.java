@@ -59,6 +59,10 @@ public class FRC {
     }
 
     public static String[] searchPlayoffBracket(int season, String event, String defaultValue) {
-        return get("/" + season + "/matches/" + event + "?tournamentLevel=Playoff", defaultValue);
+        return get("/%s/matches/%s?tournamentLevel=Playoff".formatted(season, event), defaultValue);
+    }
+
+    public static String[] searchAllianceSelection(int season, String event, String defaultValue) {
+        return get("/%s/alliances/%s".formatted(season, event), defaultValue);
     }
 }
