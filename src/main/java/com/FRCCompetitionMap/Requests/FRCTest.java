@@ -34,6 +34,6 @@ public class FRCTest {
 
 //        System.out.println(playoffMatch.getNumber());
 
-        System.out.println(playoffMatch.getAlliance(PlayoffMatch.AllianceType.RED));
+        System.out.println(playoffMatch);
     }
 }

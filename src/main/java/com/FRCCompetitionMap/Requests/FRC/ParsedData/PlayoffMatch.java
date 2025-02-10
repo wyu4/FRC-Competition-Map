@@ -12,8 +12,13 @@ public class PlayoffMatch {
         BLUE, RED
     }
 
-    private Integer matchNumber = null;
+    public enum WinnerType {
+        BLUE, RED, TIE
+    }
+
+    private Integer matchNumber = null, roundNumber = null;
     private String description = null;
+    private WinnerType winner = null;
     private final LinkedTreeMap<?, ?> tree;
     private final HashMap<AllianceType, List<Integer>> alliances = new HashMap<>();
 
@@ -24,18 +29,28 @@ public class PlayoffMatch {
     public Integer getNumber() {
         if (matchNumber == null) {
             Object raw = tree.get("matchNumber");
-            if (raw instanceof Double) {
-                matchNumber = (int) ((double) raw);
+            if (raw instanceof Double parsed) {
+                matchNumber = parsed.intValue();
             }
         }
         return matchNumber;
     }
 
+    public Integer getRoundNumber() {
+        if (roundNumber == null) {
+            String desc = getDescription();
+            if (desc != null) {
+                
+            }
+        }
+        return roundNumber;
+    }
+
     public String getDescription() {
         if (description == null) {
             Object raw = tree.get("description");
-            if (raw instanceof String) {
-                description = (String) raw;
+            if (raw instanceof String parsed) {
+                description = parsed;
             }
         }
         return description;
@@ -65,21 +80,38 @@ public class PlayoffMatch {
                 }
 
                 Object rawTeamNumber = parsedTeam.get("teamNumber");
-                if (!(rawTeamNumber instanceof Double || rawTeamNumber instanceof Integer)) {
+                if (!(rawTeamNumber instanceof Double)) {
                     continue;
                 }
-                selectedAlliance.add((int)((double) rawTeamNumber));
+                selectedAlliance.add(((Double) rawTeamNumber).intValue());
             }
         }
         return alliances.get(alliance);
     }
 
-    @Override
-    public String toString() {
-        return "\"" + getDescription() + "\"";
+    public WinnerType getWinner() {
+        if (winner == null) {
+            int scoreRed = 0;
+            int scoreBlue = 0;
+            if (tree.get("scoreRedFinal") instanceof Double score) {
+                scoreRed = score.intValue();
+            }
+            if (tree.get("scoreBlueFinal") instanceof Double score) {
+                scoreBlue = score.intValue();
+            }
+            if (scoreRed > scoreBlue) {
+                winner = WinnerType.RED;
+            } else if (scoreRed < scoreBlue) {
+                winner = WinnerType.BLUE;
+            } else {
+                winner = WinnerType.TIE;
+            }
+        }
+        return winner;
     }
 
-    public static void main(String[] args) {
-
+    @Override
+    public String toString() {
+        return "Match \"" + getDescription() + "\": R" + getAlliance(AllianceType.RED) + " VS B" + getAlliance(AllianceType.BLUE);
     }
 }
