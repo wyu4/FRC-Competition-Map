@@ -1,7 +1,11 @@
 package com.FRCCompetitionMap;
 
+import com.FRCCompetitionMap.Gui.Session;
+
+import java.awt.EventQueue;
+
 public class Start {
     public static void main(String[] args) {
-        System.out.println("Maven Project");
+        EventQueue.invokeLater(Session::startSession);
     }
 }
