@@ -28,6 +28,7 @@ public class Session extends JFrame implements ActionListener {
         super("FRC Competition Map");
         runtime = new Timer(1, this);
 
+        setLayout(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setMinimumSize(new Dimension((int)(SessionUtils.SCREEN_SIZE.getWidth()), (int)(SessionUtils.SCREEN_SIZE.getHeight()*0.6)));
         setMaximumSize(SessionUtils.SCREEN_SIZE);
@@ -51,6 +52,14 @@ public class Session extends JFrame implements ActionListener {
         return super.add(comp);
     }
 
+    @Override
+    public void remove(Component comp) {
+        if (comp instanceof SessionPage page) {
+            pages.remove(page);
+        }
+        super.remove(comp);
+    }
+
     public static void startSession() {
         LOGGER.debug("Starting session.");
         try {
@@ -72,6 +81,7 @@ public class Session extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(runtime)) {
             updateAll();
+            repaint();
         }
     }
 }
