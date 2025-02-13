@@ -14,11 +14,13 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Session extends JFrame implements ActionListener {
+public class Session extends JFrame implements ActionListener, WindowListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(Session.class);
     private final List<SessionPage> pages = new ArrayList<>();
     private final MainPage mainPage = new MainPage();
@@ -26,7 +28,7 @@ public class Session extends JFrame implements ActionListener {
 
     public Session() {
         super("FRC Competition Map");
-        runtime = new Timer(1, this);
+        runtime = new Timer(1000/30, this);
 
         setLayout(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -36,12 +38,11 @@ public class Session extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         add(mainPage);
+        addWindowListener(this);
 
         revalidate();
         repaint();
         setVisible(true);
-
-        runtime.start();
     }
 
     @Override
@@ -84,4 +85,33 @@ public class Session extends JFrame implements ActionListener {
             repaint();
         }
     }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+        EventQueue.invokeLater(runtime::start);
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+        EventQueue.invokeLater(runtime::stop);
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {}
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+        EventQueue.invokeLater(runtime::stop);
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+        EventQueue.invokeLater(runtime::restart);
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {}
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {}
 }
