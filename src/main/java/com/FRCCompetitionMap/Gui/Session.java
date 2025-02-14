@@ -5,10 +5,8 @@ import com.formdev.flatlaf.FlatLaf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.Timer;
+import javax.swing.*;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -69,9 +67,15 @@ public class Session extends JFrame implements ActionListener, WindowListener {
             LOGGER.debug("Flatlaf themes applied.");
         } catch (Exception e) {
             LOGGER.error("Could not install Flatlaf themes.", e);
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e2) {
+                LOGGER.error("Could not setup look & feel to default.", e2);
+            }
         }
+
         LOGGER.debug("Ready to launch session.");
-        EventQueue.invokeLater(Session::new);
+        SwingUtilities.invokeLater(Session::new);
     }
 
     private void updateAll() {

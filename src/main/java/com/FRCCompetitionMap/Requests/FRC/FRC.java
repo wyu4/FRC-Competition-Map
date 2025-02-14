@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Base64;
 
 /**
@@ -56,6 +57,13 @@ public class FRC {
         }
 
         return new String[] {String.valueOf(responseCode), result.toString()};
+    }
+
+    public static boolean checkCredentials() {
+        String[] results = get("/", "{}");
+        System.out.println(Arrays.toString(results));
+
+        return results[0].equals("200");
     }
 
     public static String[] searchPlayoffBracket(int season, String event, String defaultValue) {
