@@ -16,7 +16,7 @@ import java.util.Base64;
  * Class that handles HTTP Requests to the FRC API.
  */
 public class FRC {
-    public static final String API_REGISTRATION = "https://frc-events.firstinspires.org/services/api";
+    public static final String API_REGISTRATION = "https://frc-events.firstinspires.org/services/api/register";
     private static final Logger LOGGER = LoggerFactory.getLogger(FRC.class);
     private static final String API = "https://frc-api.firstinspires.org/v3.0";
     private static String AUTH;

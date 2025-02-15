@@ -128,7 +128,7 @@ class LoginSubpage extends JPanel implements MainSubpage {
     private final JPasswordField tokenField = new JPasswordField(500);
     private final JCheckBox rememberBox = new JCheckBox();
 
-    private final JButton nextButton = new JButton("Login"), registerButton = new JButton("Get credentials");
+    private final JButton nextButton = new JButton("Login"), registerButton = new JButton("Register");
 
     private final KeyListener unfocuser = new KeyListener() {
         @Override
@@ -178,6 +178,7 @@ class LoginSubpage extends JPanel implements MainSubpage {
 
         nextButton.setFocusPainted(false);
         nextButton.setFocusable(false);
+
 
         registerButton.addActionListener((a) -> {
             registerButton.setEnabled(false);
@@ -235,12 +236,12 @@ class LoginSubpage extends JPanel implements MainSubpage {
         constraints.weighty = 1;
         constraints.gridy = 7;
         constraints.insets = new Insets(defaultInsets.top*2, defaultInsets.left*5, defaultInsets.bottom*2, defaultInsets.right*5);
-        displayPanel.add(registerButton, constraints);
+        displayPanel.add(nextButton, constraints);
 
         constraints.weighty = 1;
         constraints.gridy = 8;
         constraints.insets.bottom = defaultInsets.bottom*50;
-        displayPanel.add(nextButton, constraints);
+        displayPanel.add(registerButton, constraints);
 
         add(displayPanel);
 
@@ -277,7 +278,7 @@ class LoginSubpage extends JPanel implements MainSubpage {
         tokenField.setFont(tokenField.getFont().deriveFont(fontSize*0.9f));
         rememberLabel.setFont(rememberLabel.getFont().deriveFont(fontSize*0.6f));
         credentialErrorLabel.setFont(credentialErrorLabel.getFont().deriveFont(fontSize*0.8f));
-        registerButton.setFont(registerButton.getFont().deriveFont(registerButton.getWidth()*0.1f));
+        registerButton.setFont(registerButton.getFont().deriveFont(registerButton.getWidth()*0.075f));
         nextButton.setFont(registerButton.getFont());
     }
 
