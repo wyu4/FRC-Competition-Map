@@ -3,10 +3,13 @@ package com.FRCCompetitionMap.Gui;
 import com.FRCCompetitionMap.Requests.FRC.FRC;
 import com.formdev.flatlaf.FlatClientProperties;
 import net.miginfocom.swing.MigLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -83,14 +86,27 @@ interface MainSubpage {
     void update();
 
     boolean canMoveOn();
+
+    JButton nextButton();
+
+    default JButton lastButton() {
+        return null;
+    };
 }
 
 class LoginSubpage extends JPanel implements MainSubpage {
+    private static final String ERROR_INVALID_CREDENTIALS = "Please check your credentials.";
+    private static final String ERROR_OPEN_REGISTRATION = "An error occurred. Please try again.";
+
+    private final Logger LOGGER = LoggerFactory.getLogger(LoginSubpage.class);
+
     private final JLabel usernameHeader = new JLabel("Username"), tokenHeader = new JLabel("API Token"), rememberLabel = new JLabel("Remember me"), credentialErrorLabel = new JLabel("Please check your credentials.");
 
     private final JTextField usernameField = new JTextField(100);
     private final JPasswordField tokenField = new JPasswordField(500);
     private final JCheckBox rememberBox = new JCheckBox();
+
+    private final JButton nextButton = new JButton("Login"), registerButton = new JButton("Get credentials");
 
     private final KeyListener unfocuser = new KeyListener() {
         @Override
@@ -124,9 +140,24 @@ class LoginSubpage extends JPanel implements MainSubpage {
 
         usernameHeader.setFont(usernameHeader.getFont().deriveFont(Font.BOLD));
         tokenHeader.setFont(tokenHeader.getFont().deriveFont(Font.BOLD));
+        registerButton.setFont(registerButton.getFont().deriveFont(Font.BOLD));
 
         credentialErrorLabel.setForeground(new Color(241, 107, 107));
         credentialErrorLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        credentialErrorLabel.setVisible(false);
+
+        registerButton.setFocusPainted(false);
+        registerButton.setOpaque(true);
+
+        registerButton.addActionListener((a) -> {
+            try {
+                SessionUtils.openLink(FRC.API_REGISTRATION);
+            } catch (IOException e) {
+                credentialErrorLabel.setText(ERROR_OPEN_REGISTRATION);
+                credentialErrorLabel.setVisible(true);
+                LOGGER.error("Could not open token registration page.", e);
+            }
+        });
 
         add(usernameHeader);
         add(usernameField);
@@ -135,6 +166,7 @@ class LoginSubpage extends JPanel implements MainSubpage {
         add(rememberBox);
         add(rememberLabel);
         add(credentialErrorLabel);
+        add(registerButton);
     }
 
     @Override
@@ -180,14 +212,31 @@ class LoginSubpage extends JPanel implements MainSubpage {
         rememberLabel.setLocation((int)((rememberBox.getX()+rememberBox.getWidth())*1.25f), rememberBox.getY());
         rememberLabel.setFont(rememberLabel.getFont().deriveFont(fontSize*0.6f));
 
-        credentialErrorLabel.setSize(usernameField.getSize());
+        credentialErrorLabel.setSize(usernameHeader.getSize());
         credentialErrorLabel.setLocation(rememberBox.getX(), (int)(rememberLabel.getY() + rememberLabel.getHeight()*1.5f));
         credentialErrorLabel.setFont(credentialErrorLabel.getFont().deriveFont(fontSize*0.8f));
+
+        registerButton.setSize(usernameHeader.getWidth()/2, usernameHeader.getHeight());
+        registerButton.setLocation(credentialErrorLabel.getX()+usernameHeader.getWidth()/4, (int)(credentialErrorLabel.getY() + credentialErrorLabel.getHeight()*1.2f));
+        registerButton.setFont(registerButton.getFont().deriveFont(registerButton.getWidth()*0.1f));
     }
 
     @Override
     public boolean canMoveOn() {
         FRC.setAuth(usernameField.getText(), String.valueOf(tokenField.getPassword()));
-        return FRC.checkCredentials();
+        boolean correctCredentials = FRC.checkCredentials();
+
+        if (correctCredentials) {
+            return true;
+        }
+
+        credentialErrorLabel.setVisible(true);
+        credentialErrorLabel.setText(ERROR_INVALID_CREDENTIALS);
+        return false;
+    }
+
+    @Override
+    public JButton nextButton() {
+        return nextButton;
     }
 }
