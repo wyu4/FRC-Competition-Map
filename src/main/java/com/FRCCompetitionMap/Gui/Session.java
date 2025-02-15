@@ -21,7 +21,7 @@ import java.util.List;
 public class Session extends JFrame implements ActionListener, WindowListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(Session.class);
     private final List<SessionPage> pages = new ArrayList<>();
-    private final MainPage mainPage = new MainPage();
+    private final MainPage mainPage = new MainPage(() -> LOGGER.debug("Last page!"));
     private final Timer runtime;
 
     public Session() {

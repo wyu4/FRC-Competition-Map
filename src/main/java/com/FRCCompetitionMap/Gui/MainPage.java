@@ -21,15 +21,35 @@ public class MainPage extends JPanel implements SessionPage {
     private final List<MainSubpage> subpages = List.of(
             new LoginSubpage()
     );
+    private final Runnable onEnd;
 
-    public MainPage() {
+    public MainPage(Runnable onEnd) {
         super(null);
+        this.onEnd = onEnd;
+
         putClientProperty(FlatClientProperties.STYLE, "arc: 10; background: $subpage.background");
 
         header.setFont(header.getFont().deriveFont(Font.BOLD));
 
         add(header);
-        subpages.forEach((page) -> add((Component) page));
+        subpages.forEach((page) -> {
+            if (page.lastButton() != null) {
+                page.lastButton().addActionListener((a) -> {
+                    if (isFirstPage()) {
+                        return;
+                    }
+                    prevPage();
+                });
+            }
+            page.nextButton().addActionListener((a) -> {
+                if (isLastPage()) {
+                    onEnd.run();
+                    return;
+                }
+                nextPage();
+            });
+            add((Component) page);
+        });
         currentSubpage = subpages.getFirst();
         add(new JButton());
 
@@ -142,12 +162,11 @@ class LoginSubpage extends JPanel implements MainSubpage {
         tokenHeader.setFont(tokenHeader.getFont().deriveFont(Font.BOLD));
         registerButton.setFont(registerButton.getFont().deriveFont(Font.BOLD));
 
-        credentialErrorLabel.setForeground(new Color(241, 107, 107));
+        credentialErrorLabel.setForeground(UIManager.getColor("errorColor"));
         credentialErrorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         credentialErrorLabel.setVisible(false);
 
         registerButton.setFocusPainted(false);
-        registerButton.setOpaque(true);
 
         registerButton.addActionListener((a) -> {
             try {
@@ -159,6 +178,15 @@ class LoginSubpage extends JPanel implements MainSubpage {
             }
         });
 
+        usernameHeader.setDoubleBuffered(true);
+        usernameField.setDoubleBuffered(true);
+        tokenHeader.setDoubleBuffered(true);
+        tokenField.setDoubleBuffered(true);
+        rememberBox.setDoubleBuffered(true);
+        rememberLabel.setDoubleBuffered(true);
+        credentialErrorLabel.setDoubleBuffered(true);
+        registerButton.setDoubleBuffered(true);
+
         add(usernameHeader);
         add(usernameField);
         add(tokenHeader);
@@ -167,6 +195,8 @@ class LoginSubpage extends JPanel implements MainSubpage {
         add(rememberLabel);
         add(credentialErrorLabel);
         add(registerButton);
+
+        revalidate();
     }
 
     @Override
