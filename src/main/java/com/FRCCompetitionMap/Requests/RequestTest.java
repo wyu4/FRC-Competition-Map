@@ -21,7 +21,7 @@ public class RequestTest {
         file.createNewFile();
         System.setOut(new PrintStream(file));
 
-        String playoffBracket = FRC.searchAllianceSelection(2023, "arpky", "{}")[1];
+        String playoffBracket = FRC.searchAllianceSelection(2023, "arpky", "{}")[1].toString();
 
         System.out.println(playoffBracket);
     }

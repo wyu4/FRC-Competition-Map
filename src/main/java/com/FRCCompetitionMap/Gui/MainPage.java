@@ -1,8 +1,8 @@
 package com.FRCCompetitionMap.Gui;
 
+import com.FRCCompetitionMap.Requests.Callbacks.BooleanCallback;
 import com.FRCCompetitionMap.Requests.FRC.FRC;
 import com.formdev.flatlaf.FlatClientProperties;
-import net.miginfocom.swing.MigLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,12 +10,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainPage extends JPanel implements SessionPage {
-    private MainSubpage currentSubpage;
+    private volatile MainSubpage currentSubpage;
 
     private final JLabel header = new JLabel("HEADER");
     private final List<MainSubpage> subpages = List.of(
@@ -41,13 +41,13 @@ public class MainPage extends JPanel implements SessionPage {
                     prevPage();
                 });
             }
-            page.nextButton().addActionListener((a) -> {
+            page.nextButton().addActionListener((a) -> page.canMoveOn(() -> {
                 if (isLastPage()) {
                     onEnd.run();
                     return;
                 }
                 nextPage();
-            });
+            }));
             add((Component) page);
         });
         currentSubpage = subpages.getFirst();
@@ -105,7 +105,7 @@ interface MainSubpage {
 
     void update();
 
-    boolean canMoveOn();
+    void canMoveOn(Runnable onSuccess);
 
     JButton nextButton();
 
@@ -117,6 +117,8 @@ interface MainSubpage {
 class LoginSubpage extends JPanel implements MainSubpage {
     private static final String ERROR_INVALID_CREDENTIALS = "Please check your credentials.";
     private static final String ERROR_OPEN_REGISTRATION = "An error occurred. Please try again.";
+
+    private final JPanel displayPanel = new JPanel(new GridBagLayout());
 
     private final Logger LOGGER = LoggerFactory.getLogger(LoginSubpage.class);
 
@@ -152,6 +154,8 @@ class LoginSubpage extends JPanel implements MainSubpage {
             }
         });
 
+        displayPanel.setBackground(UIManager.getColor("invisible"));
+
         usernameField.setHorizontalAlignment(SwingConstants.CENTER);
         tokenField.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -162,13 +166,21 @@ class LoginSubpage extends JPanel implements MainSubpage {
         tokenHeader.setFont(tokenHeader.getFont().deriveFont(Font.BOLD));
         registerButton.setFont(registerButton.getFont().deriveFont(Font.BOLD));
 
+        rememberBox.setFocusPainted(false);
+        rememberBox.setFocusable(false);
+
         credentialErrorLabel.setForeground(UIManager.getColor("errorColor"));
         credentialErrorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         credentialErrorLabel.setVisible(false);
 
         registerButton.setFocusPainted(false);
+        registerButton.setFocusable(false);
+
+        nextButton.setFocusPainted(false);
+        nextButton.setFocusable(false);
 
         registerButton.addActionListener((a) -> {
+            registerButton.setEnabled(false);
             try {
                 SessionUtils.openLink(FRC.API_REGISTRATION);
             } catch (IOException e) {
@@ -176,27 +188,64 @@ class LoginSubpage extends JPanel implements MainSubpage {
                 credentialErrorLabel.setVisible(true);
                 LOGGER.error("Could not open token registration page.", e);
             }
+            registerButton.setEnabled(true);
         });
 
-        usernameHeader.setDoubleBuffered(true);
-        usernameField.setDoubleBuffered(true);
-        tokenHeader.setDoubleBuffered(true);
-        tokenField.setDoubleBuffered(true);
-        rememberBox.setDoubleBuffered(true);
-        rememberLabel.setDoubleBuffered(true);
-        credentialErrorLabel.setDoubleBuffered(true);
-        registerButton.setDoubleBuffered(true);
+        GridBagConstraints constraints = new GridBagConstraints();
+        Insets defaultInsets = new Insets((int)(SessionUtils.SCREEN_SIZE.getHeight()*0.001f), (int)(SessionUtils.SCREEN_SIZE.getWidth()*0.01f), (int)(SessionUtils.SCREEN_SIZE.getHeight()*0.001f), (int)(SessionUtils.SCREEN_SIZE.getWidth()*0.01f));
 
-        add(usernameHeader);
-        add(usernameField);
-        add(tokenHeader);
-        add(tokenField);
-        add(rememberBox);
-        add(rememberLabel);
-        add(credentialErrorLabel);
-        add(registerButton);
+        constraints.weightx = 1;
+        constraints.weighty = 1.2;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.insets = defaultInsets;
+        constraints.gridx = 1; constraints.gridy = 1;
+        constraints.gridwidth = 2;
+        constraints.gridheight = 1;
+        displayPanel.add(usernameHeader, constraints);
+
+        constraints.weighty = 1;
+        constraints.gridy = 2;
+        displayPanel.add(usernameField, constraints);
+
+        constraints.weighty = 1.2;
+        constraints.gridy = 3;
+        displayPanel.add(tokenHeader, constraints);
+
+        constraints.weighty = 1;
+        constraints.gridy = 4;
+        displayPanel.add(tokenField, constraints);
+
+        constraints.weightx = 0.1; constraints.weighty = 0.5;
+        constraints.gridx = 1; constraints.gridy = 5;
+        constraints.gridwidth = 1;
+        constraints.insets = new Insets(defaultInsets.top, defaultInsets.left, defaultInsets.bottom, 0);
+        displayPanel.add(rememberBox, constraints);
+
+        constraints.weightx = 2; constraints.weighty = 0.5;
+        constraints.gridx = 2; constraints.gridy = 5;
+        constraints.insets = new Insets(defaultInsets.top, 0, defaultInsets.bottom, defaultInsets.right);
+        displayPanel.add(rememberLabel, constraints);
+
+        constraints.weightx = 1; constraints.weighty = 1;
+        constraints.gridx = 1; constraints.gridy = 6;
+        constraints.gridwidth = 2;
+        constraints.insets = defaultInsets;
+        displayPanel.add(credentialErrorLabel, constraints);
+
+        constraints.weighty = 1;
+        constraints.gridy = 7;
+        constraints.insets = new Insets(defaultInsets.top*2, defaultInsets.left*5, defaultInsets.bottom*2, defaultInsets.right*5);
+        displayPanel.add(registerButton, constraints);
+
+        constraints.weighty = 1;
+        constraints.gridy = 8;
+        constraints.insets.bottom = defaultInsets.bottom*50;
+        displayPanel.add(nextButton, constraints);
+
+        add(displayPanel);
 
         revalidate();
+        repaint();
     }
 
     @Override
@@ -217,52 +266,50 @@ class LoginSubpage extends JPanel implements MainSubpage {
             return;
         }
 
-        float fontSize = getWidth()*0.05f;
+        displayPanel.setSize(getSize());
+        displayPanel.setLocation(0, 0);
 
-        usernameHeader.setSize((int)(getWidth() * 0.9f), (int)(getHeight() * 0.1f));
-        usernameHeader.setLocation((getWidth()/2) - (usernameHeader.getWidth()/2), (int)(getHeight()*0.1f));
+        final float fontSize = getWidth()*0.05f;
+
         usernameHeader.setFont(usernameHeader.getFont().deriveFont(fontSize));
-
-        usernameField.setSize(usernameHeader.getSize());
-        usernameField.setLocation(usernameHeader.getX(), usernameHeader.getY() + usernameHeader.getHeight());
         usernameField.setFont(usernameField.getFont().deriveFont(fontSize*0.9f));
-
-        tokenHeader.setSize(usernameField.getSize());
-        tokenHeader.setLocation(usernameHeader.getX(), (int)(usernameField.getY() + usernameField.getHeight()*1.5f));
         tokenHeader.setFont(tokenHeader.getFont().deriveFont(fontSize));
-
-        tokenField.setSize(usernameField.getSize());
-        tokenField.setLocation(tokenHeader.getX(), tokenHeader.getY() + tokenHeader.getHeight());
         tokenField.setFont(tokenField.getFont().deriveFont(fontSize*0.9f));
-
-        rememberBox.setSize(usernameHeader.getHeight()/2, usernameHeader.getHeight()/2);
-        rememberBox.setLocation(tokenField.getX(), tokenField.getY() + tokenField.getHeight());
-
-        rememberLabel.setSize(usernameHeader.getWidth() - (rememberBox.getWidth()+rememberBox.getX()), rememberBox.getHeight());
-        rememberLabel.setLocation((int)((rememberBox.getX()+rememberBox.getWidth())*1.25f), rememberBox.getY());
         rememberLabel.setFont(rememberLabel.getFont().deriveFont(fontSize*0.6f));
-
-        credentialErrorLabel.setSize(usernameHeader.getSize());
-        credentialErrorLabel.setLocation(rememberBox.getX(), (int)(rememberLabel.getY() + rememberLabel.getHeight()*1.5f));
         credentialErrorLabel.setFont(credentialErrorLabel.getFont().deriveFont(fontSize*0.8f));
-
-        registerButton.setSize(usernameHeader.getWidth()/2, usernameHeader.getHeight());
-        registerButton.setLocation(credentialErrorLabel.getX()+usernameHeader.getWidth()/4, (int)(credentialErrorLabel.getY() + credentialErrorLabel.getHeight()*1.2f));
         registerButton.setFont(registerButton.getFont().deriveFont(registerButton.getWidth()*0.1f));
+        nextButton.setFont(registerButton.getFont());
     }
 
     @Override
-    public boolean canMoveOn() {
+    public void canMoveOn(Runnable onSuccess) {
+        nextButton.setEnabled(false);
+        nextButton.setText("Checking...");
+
         FRC.setAuth(usernameField.getText(), String.valueOf(tokenField.getPassword()));
-        boolean correctCredentials = FRC.checkCredentials();
+        new Thread(() -> {
 
-        if (correctCredentials) {
-            return true;
-        }
+            Integer code = FRC.checkCredentials();
+            credentialErrorLabel.setVisible(code!=200);
 
-        credentialErrorLabel.setVisible(true);
-        credentialErrorLabel.setText(ERROR_INVALID_CREDENTIALS);
-        return false;
+            nextButton.setEnabled(true);
+            nextButton.setText("Login");
+
+            switch (code) {
+                case 200: onSuccess.run(); break;
+                case 401: credentialErrorLabel.setText("Invalid credentials."); break;
+                case 408 | 500: credentialErrorLabel.setText("Please try again."); break;
+                case 503: credentialErrorLabel.setText("Please check your internet connection."); break;
+                default: credentialErrorLabel.setText("Unknown error (" + code + ")"); break;
+            }
+
+//            if (!result) {
+//                credentialErrorLabel.setText(ERROR_INVALID_CREDENTIALS);
+//                credentialErrorLabel.setForeground(UIManager.getColor("errorColor"));
+//            }
+
+
+        }).start();
     }
 
     @Override

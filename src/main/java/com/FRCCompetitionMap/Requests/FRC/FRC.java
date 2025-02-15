@@ -26,7 +26,7 @@ public class FRC {
     }
 
 
-    public static String[] get(String endpoint, String defaultValue) {
+    public static Object[] get(String endpoint, String defaultValue) {
         URL url;
         try {
             url = URI.create(API + endpoint).toURL();
@@ -57,21 +57,19 @@ public class FRC {
             result = new StringBuilder(defaultValue);
         }
 
-        return new String[] {String.valueOf(responseCode), result.toString()};
+        return new Object[] {responseCode, result.toString()};
     }
 
-    public static boolean checkCredentials() {
-        String[] results = get("/", "{}");
-        System.out.println(Arrays.toString(results));
-
-        return results[0].equals("200");
+    public static Integer checkCredentials() {
+        Object[] results = get("/", "{}");
+        return Integer.parseInt(results[0].toString());
     }
 
-    public static String[] searchPlayoffBracket(int season, String event, String defaultValue) {
+    public static Object[] searchPlayoffBracket(int season, String event, String defaultValue) {
         return get("/%s/matches/%s?tournamentLevel=Playoff".formatted(season, event), defaultValue);
     }
 
-    public static String[] searchAllianceSelection(int season, String event, String defaultValue) {
+    public static Object[] searchAllianceSelection(int season, String event, String defaultValue) {
         return get("/%s/alliances/%s".formatted(season, event), defaultValue);
     }
 }
