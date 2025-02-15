@@ -296,10 +296,10 @@ class LoginSubpage extends JPanel implements MainSubpage {
             nextButton.setText("Login");
 
             switch (code) {
+                case 0 : credentialErrorLabel.setText("Please check your internet connection."); break;
                 case 200: onSuccess.run(); break;
                 case 401: credentialErrorLabel.setText("Invalid credentials."); break;
                 case 408 | 500: credentialErrorLabel.setText("Please try again."); break;
-                case 503: credentialErrorLabel.setText("Please check your internet connection."); break;
                 default: credentialErrorLabel.setText("Unknown error (" + code + ")"); break;
             }
 
