@@ -1,2 +1,2 @@
 # FRC Competition Map
-Powered by [The Blue Alliance](https://www.thebluealliance.com/)
+Powered by [FIRST Robotics Competition](https://frc-events.firstinspires.org/services/api)

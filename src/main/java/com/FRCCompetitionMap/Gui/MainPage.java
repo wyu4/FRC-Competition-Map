@@ -79,13 +79,6 @@ public class MainPage extends RoundedPanel implements SessionPage {
             return;
         }
 
-        Container parent = getParent();
-        if (parent == null) {
-            return;
-        }
-        setSize(parent.getWidth()/4, parent.getWidth()/4);
-        setLocation(SessionUtils.calculateCenterLocation(parent, this));
-
         if (currentSubpage != null) {
             header.setText(currentSubpage.getHeader());
             currentSubpage.update();

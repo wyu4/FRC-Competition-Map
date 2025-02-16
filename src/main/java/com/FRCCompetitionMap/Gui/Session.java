@@ -20,6 +20,7 @@ public class Session extends JFrame implements ActionListener, WindowListener {
     private final List<SessionPage> pages = new ArrayList<>();
     private final MainPage mainPage = new MainPage(() -> LOGGER.debug("Last page!"));
     private final GradientPanel gradientBackground = new GradientPanel();
+    private final FIRSTAttribution attribution = new FIRSTAttribution();
     private final Timer runtime;
 
     public Session() {
@@ -29,7 +30,7 @@ public class Session extends JFrame implements ActionListener, WindowListener {
         JFrame.setDefaultLookAndFeelDecorated(false);
         setLayout(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setMinimumSize(new Dimension((int)(SessionUtils.SCREEN_SIZE.getWidth()), (int)(SessionUtils.SCREEN_SIZE.getHeight()*0.6)));
+        setMinimumSize(new Dimension((int)(SessionUtils.SCREEN_SIZE.getWidth()), (int)(SessionUtils.SCREEN_SIZE.getHeight()*0.75)));
         setMaximumSize(SessionUtils.SCREEN_SIZE);
         setSize(getMinimumSize());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -37,6 +38,7 @@ public class Session extends JFrame implements ActionListener, WindowListener {
         gradientBackground.setLocation(0, 0);
 
         add(mainPage);
+        add(attribution);
         add(gradientBackground);
         addWindowListener(this);
 
@@ -87,7 +89,14 @@ public class Session extends JFrame implements ActionListener, WindowListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(runtime)) {
+            mainPage.setSize(getWidth()/4, getWidth()/4);
+            mainPage.setLocation(SessionUtils.calculateCenterLocation(this, mainPage));
+
+            attribution.setSize((int)(mainPage.getWidth()*0.75f), (getHeight()-mainPage.getY()-mainPage.getHeight())/2);
+            attribution.setLocation(SessionUtils.calculateCenterLocation(this, attribution).x, mainPage.getY() + mainPage.getHeight());
+
             gradientBackground.setSize(getSize());
+
             updateAll();
             repaint();
         }
