@@ -17,12 +17,17 @@ public class RequestTest {
 //
 //        System.out.println(playoffBracket);
 
-        File file = new File("allianceDataTest.json");
+//        File file = new File("allianceDataTest.json");
+//        file.createNewFile();
+//        System.setOut(new PrintStream(file));
+//
+//        String playoffBracket = FRC.searchAllianceSelection(2023, "arpky", "{}")[1].toString();
+//
+//        System.out.println(playoffBracket);
+
+        File file = new File("eventListingsTest.json");
         file.createNewFile();
         System.setOut(new PrintStream(file));
-
-        String playoffBracket = FRC.searchAllianceSelection(2023, "arpky", "{}")[1].toString();
-
-        System.out.println(playoffBracket);
+        System.out.println(FRC.searchEventListings(2024, "{}")[1]);
     }
 }

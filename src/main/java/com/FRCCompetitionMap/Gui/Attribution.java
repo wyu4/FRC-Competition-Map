@@ -13,7 +13,7 @@ import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-public class Attribution extends JPanel implements SessionPage {
+public class Attribution extends JPanel implements SessionComponents {
     private static final Logger LOGGER = LoggerFactory.getLogger(Attribution.class);
 
     private final JLabel poweredLabel = new JLabel("Powered by");

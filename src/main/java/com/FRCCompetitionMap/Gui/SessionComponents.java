@@ -1,5 +1,5 @@
 package com.FRCCompetitionMap.Gui;
 
-public interface SessionPage {
+public interface SessionComponents {
     public void update();
 }

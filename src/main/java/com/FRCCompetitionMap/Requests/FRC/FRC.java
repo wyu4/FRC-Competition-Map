@@ -72,4 +72,8 @@ public class FRC {
     public static Object[] searchAllianceSelection(int season, String event, String defaultValue) {
         return get("/%s/alliances/%s".formatted(season, event), defaultValue);
     }
+
+    public static Object[] searchEventListings(int season, String defaultValue) {
+        return get("/%s/events".formatted(season), defaultValue);
+    }
 }

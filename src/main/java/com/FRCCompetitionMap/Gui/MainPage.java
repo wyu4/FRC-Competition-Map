@@ -14,12 +14,13 @@ import java.nio.file.Files;
 import java.util.Base64;
 import java.util.List;
 
-public class MainPage extends RoundedPanel implements SessionPage {
+public class MainPage extends RoundedPanel implements SessionComponents {
     private volatile MainSubpage currentSubpage;
 
     private final JLabel header = new JLabel("HEADER");
     private final List<MainSubpage> subpages = List.of(
-            new LoginSubpage()
+            new LoginSubpage(),
+            new SeasonSelectionSubpage()
     );
     private final Runnable onEnd;
 
@@ -36,22 +37,30 @@ public class MainPage extends RoundedPanel implements SessionPage {
         subpages.forEach((page) -> {
             if (page.lastButton() != null) {
                 page.lastButton().addActionListener((a) -> {
+                    if (!page.isFocusedPage()) {
+                        return;
+                    }
                     if (isFirstPage()) {
                         return;
                     }
                     prevPage();
                 });
             }
-            page.nextButton().addActionListener((a) -> page.canMoveOn(() -> {
-                if (isLastPage()) {
-                    onEnd.run();
-                    return;
-                }
-                nextPage();
-            }));
+            if (page.nextButton() != null) {
+                page.nextButton().addActionListener((a) -> page.canMoveOn(() -> {
+                    if (!page.isFocusedPage()) {
+                        return;
+                    }
+                    if (isLastPage()) {
+                        onEnd.run();
+                        return;
+                    }
+                    nextPage();
+                }));
+            }
             add((Component) page);
         });
-        currentSubpage = subpages.getFirst();
+        setPage(subpages.getFirst());
         add(new JButton());
     }
 
@@ -64,12 +73,19 @@ public class MainPage extends RoundedPanel implements SessionPage {
     }
 
     private void nextPage() {
-        currentSubpage = subpages.get(subpages.indexOf(currentSubpage) + 1);
-        revalidate();
+        setPage(subpages.get(subpages.indexOf(currentSubpage) + 1));
     }
 
     private void prevPage() {
-        currentSubpage = subpages.get(subpages.indexOf(currentSubpage) - 1);
+        setPage(subpages.get(subpages.indexOf(currentSubpage) - 1));
+    }
+
+    private void setPage(MainSubpage page) {
+        if (currentSubpage != null) {
+            currentSubpage.setFocusedPage(false);
+        }
+        page.setFocusedPage(true);
+        currentSubpage = page;
         revalidate();
     }
 
@@ -97,6 +113,12 @@ interface MainSubpage {
 
     void update();
 
+    void setFocusedPage(boolean focused);
+
+    boolean isFocusedPage();
+
+    JPanel getDisplayPanel();
+
     void canMoveOn(Runnable onSuccess);
 
     JButton nextButton();
@@ -106,11 +128,38 @@ interface MainSubpage {
     };
 }
 
-class LoginSubpage extends JPanel implements MainSubpage {
+class SubpageTemplate extends JPanel {
+    protected final JPanel displayPanel;
+
+    public SubpageTemplate(LayoutManager layout) {
+        super(null);
+        displayPanel = new JPanel(layout);
+        displayPanel.setBackground(UIManager.getColor("invisible"));
+        add(displayPanel);
+    }
+
+    public void templateUpdate(Runnable customTask) {
+        Container parent = getParent();
+        if (parent == null) {
+            return;
+        }
+        setSize(parent.getWidth(), (int)(parent.getHeight()*0.9f));
+        setLocation(0, (int)(parent.getHeight()*0.1f));
+
+        if (!isVisible()) {
+            return;
+        }
+
+        displayPanel.setSize(getSize());
+        displayPanel.setLocation(0, 0);
+
+        customTask.run();
+    }
+}
+
+class LoginSubpage extends SubpageTemplate implements MainSubpage {
     private static final String SECRET_FILE = "secret";
     private static final String ERROR_OPEN_REGISTRATION = "An error occurred. Please try again.";
-
-    private final JPanel displayPanel = new JPanel(new GridBagLayout());
 
     private final Logger LOGGER = LoggerFactory.getLogger(LoginSubpage.class);
 
@@ -121,6 +170,8 @@ class LoginSubpage extends JPanel implements MainSubpage {
     private final JCheckBox rememberBox = new JCheckBox();
 
     private final JButton nextButton = new JButton("Login"), registerButton = new JButton("Register");
+
+    private boolean focusedPage;
 
     private final KeyListener unfocuser = new KeyListener() {
         @Override
@@ -136,8 +187,10 @@ class LoginSubpage extends JPanel implements MainSubpage {
     };
 
     public LoginSubpage() {
-        super(null);
-        setBackground(new Color(0, 0, 0, 0));
+        super(new GridBagLayout());
+        focusedPage = false;
+
+        setBackground(UIManager.getColor("invisible"));
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -145,8 +198,6 @@ class LoginSubpage extends JPanel implements MainSubpage {
                 requestFocusInWindow();
             }
         });
-
-        displayPanel.setBackground(UIManager.getColor("invisible"));
 
         usernameField.setHorizontalAlignment(SwingConstants.CENTER);
         tokenField.setHorizontalAlignment(SwingConstants.CENTER);
@@ -235,8 +286,6 @@ class LoginSubpage extends JPanel implements MainSubpage {
         constraints.insets.bottom = defaultInsets.bottom*50;
         displayPanel.add(registerButton, constraints);
 
-        add(displayPanel);
-
         rememberBox.setSelected(false);
         loadCredentials();
 
@@ -251,30 +300,34 @@ class LoginSubpage extends JPanel implements MainSubpage {
 
     @Override
     public void update() {
-        Container parent = getParent();
-        if (parent == null) {
-            return;
-        }
-        setSize(parent.getWidth(), (int)(parent.getHeight()*0.9f));
-        setLocation(0, (int)(parent.getHeight()*0.1f));
+        templateUpdate(() -> {
+            final float fontSize = getWidth()*0.05f;
 
-        if (!isVisible()) {
-            return;
-        }
+            usernameHeader.setFont(usernameHeader.getFont().deriveFont(fontSize));
+            usernameField.setFont(usernameField.getFont().deriveFont(fontSize*0.9f));
+            tokenHeader.setFont(tokenHeader.getFont().deriveFont(fontSize));
+            tokenField.setFont(tokenField.getFont().deriveFont(fontSize*0.9f));
+            rememberLabel.setFont(rememberLabel.getFont().deriveFont(fontSize*0.6f));
+            credentialErrorLabel.setFont(credentialErrorLabel.getFont().deriveFont(fontSize*0.8f));
+            registerButton.setFont(registerButton.getFont().deriveFont(registerButton.getWidth()*0.075f));
+            nextButton.setFont(registerButton.getFont());
+        });
+    }
 
-        displayPanel.setSize(getSize());
-        displayPanel.setLocation(0, 0);
+    @Override
+    public void setFocusedPage(boolean focused) {
+        setVisible(focused);
+        focusedPage = focused;
+    }
 
-        final float fontSize = getWidth()*0.05f;
+    @Override
+    public boolean isFocusedPage() {
+        return focusedPage;
+    }
 
-        usernameHeader.setFont(usernameHeader.getFont().deriveFont(fontSize));
-        usernameField.setFont(usernameField.getFont().deriveFont(fontSize*0.9f));
-        tokenHeader.setFont(tokenHeader.getFont().deriveFont(fontSize));
-        tokenField.setFont(tokenField.getFont().deriveFont(fontSize*0.9f));
-        rememberLabel.setFont(rememberLabel.getFont().deriveFont(fontSize*0.6f));
-        credentialErrorLabel.setFont(credentialErrorLabel.getFont().deriveFont(fontSize*0.8f));
-        registerButton.setFont(registerButton.getFont().deriveFont(registerButton.getWidth()*0.075f));
-        nextButton.setFont(registerButton.getFont());
+    @Override
+    public JPanel getDisplayPanel() {
+        return displayPanel;
     }
 
     private void saveCredentials(String user, String token) {
@@ -379,5 +432,67 @@ class LoginSubpage extends JPanel implements MainSubpage {
     @Override
     public JButton nextButton() {
         return nextButton;
+    }
+}
+
+class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
+    private final JButton nextButton = new JButton("Next"), prevButton = new JButton("Back");
+
+    private boolean focusedPage;
+
+    public SeasonSelectionSubpage() {
+        super(null);
+        focusedPage = false;
+
+        setBackground(UIManager.getColor("invisible"));
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                requestFocusInWindow();
+            }
+        });
+    }
+
+    @Override
+    public String getHeader() {
+        return "Season";
+    }
+
+    @Override
+    public void update() {
+        templateUpdate(() -> {
+
+        });
+    }
+
+    @Override
+    public void setFocusedPage(boolean focused) {
+        setVisible(focused);
+        focusedPage = focused;
+    }
+
+    @Override
+    public boolean isFocusedPage() {
+        return focusedPage;
+    }
+
+    @Override
+    public JPanel getDisplayPanel() {
+        return displayPanel;
+    }
+
+    @Override
+    public void canMoveOn(Runnable onSuccess) {
+    }
+
+    @Override
+    public JButton nextButton() {
+        return nextButton;
+    }
+
+    @Override
+    public JButton lastButton() {
+        return prevButton;
     }
 }

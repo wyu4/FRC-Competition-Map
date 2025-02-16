@@ -18,7 +18,7 @@ import java.util.List;
 
 public class Session extends JFrame implements ActionListener, WindowListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(Session.class);
-    private final List<SessionPage> pages = new ArrayList<>();
+    private final List<SessionComponents> pages = new ArrayList<>();
     private final MainPage mainPage = new MainPage(() -> LOGGER.debug("Last page!"));
     private final GradientPanel gradientBackground = new GradientPanel();
     private final Attribution attribution = new Attribution(ImageLoader.FRC_LOGO);
@@ -50,7 +50,7 @@ public class Session extends JFrame implements ActionListener, WindowListener {
 
     @Override
     public Component add(Component comp) {
-        if (comp instanceof SessionPage parsed) {
+        if (comp instanceof SessionComponents parsed) {
             pages.add(parsed);
         }
         return super.add(comp);
@@ -58,7 +58,7 @@ public class Session extends JFrame implements ActionListener, WindowListener {
 
     @Override
     public void remove(Component comp) {
-        if (comp instanceof SessionPage page) {
+        if (comp instanceof SessionComponents page) {
             pages.remove(page);
         }
         super.remove(comp);
@@ -84,7 +84,7 @@ public class Session extends JFrame implements ActionListener, WindowListener {
     }
 
     private void updateAll() {
-        pages.forEach(SessionPage::update);
+        pages.forEach(SessionComponents::update);
     }
 
     @Override
