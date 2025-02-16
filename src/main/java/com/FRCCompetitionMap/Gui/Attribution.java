@@ -9,24 +9,23 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-public class FIRSTAttribution extends JPanel implements SessionPage {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FIRSTAttribution.class);
+public class Attribution extends JPanel implements SessionPage {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Attribution.class);
 
     private final JLabel poweredLabel = new JLabel("Powered by");
-    private final JLabel FIRSTLabel = new JLabel("[FIRST]"); // In case we can't load the image for some reason.
+    private final JLabel FIRSTLabel = new JLabel(); // In case we can't load the image for some reason.
     private SmartImageIcon icon;
 
-    public FIRSTAttribution() {
+    public Attribution(String imagePath) {
         super(null);
         setBackground(UIManager.getColor("invisible"));
 
         try {
-            BufferedImage logo = ImageLoader.load(ImageLoader.FRC_LOGO);
+            BufferedImage logo = ImageLoader.load(imagePath);
             icon = new SmartImageIcon(logo);
         } catch (IOException ignore) {}
 
@@ -34,6 +33,8 @@ public class FIRSTAttribution extends JPanel implements SessionPage {
             icon.setMode(SmartImageIcon.PaintMode.RATIO);
             FIRSTLabel.setText("");
             FIRSTLabel.setIcon(icon);
+        } else {
+            FIRSTLabel.setText(imagePath);
         }
 
         poweredLabel.setHorizontalAlignment(SwingConstants.CENTER);

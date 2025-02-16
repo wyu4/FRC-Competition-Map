@@ -2,6 +2,7 @@ package com.FRCCompetitionMap.Gui;
 
 import com.FRCCompetitionMap.Gui.CustomComponents.GradientPanel;
 import com.FRCCompetitionMap.Gui.Themes.ThemeDark;
+import com.FRCCompetitionMap.IO.ImageLoader;
 import com.formdev.flatlaf.FlatLaf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,7 @@ public class Session extends JFrame implements ActionListener, WindowListener {
     private final List<SessionPage> pages = new ArrayList<>();
     private final MainPage mainPage = new MainPage(() -> LOGGER.debug("Last page!"));
     private final GradientPanel gradientBackground = new GradientPanel();
-    private final FIRSTAttribution attribution = new FIRSTAttribution();
+    private final Attribution attribution = new Attribution(ImageLoader.FRC_LOGO);
     private final Timer runtime;
 
     public Session() {
