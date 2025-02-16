@@ -1,4 +1,5 @@
 ignore.java
+secret
 
 target/
 !.mvn/wrapper/maven-wrapper.jar

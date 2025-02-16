@@ -1,20 +1,20 @@
 package com.FRCCompetitionMap.Gui;
 
-import com.FRCCompetitionMap.Requests.Callbacks.BooleanCallback;
+import com.FRCCompetitionMap.Encryption.AES;
+import com.FRCCompetitionMap.Gui.CustomComponents.RoundedPanel;
 import com.FRCCompetitionMap.Requests.FRC.FRC;
-import com.formdev.flatlaf.FlatClientProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.util.Base64;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MainPage extends JPanel implements SessionPage {
+public class MainPage extends RoundedPanel implements SessionPage {
     private volatile MainSubpage currentSubpage;
 
     private final JLabel header = new JLabel("HEADER");
@@ -24,10 +24,11 @@ public class MainPage extends JPanel implements SessionPage {
     private final Runnable onEnd;
 
     public MainPage(Runnable onEnd) {
-        super(null);
+        super();
         this.onEnd = onEnd;
 
-        putClientProperty(FlatClientProperties.STYLE, "arc: 10; background: $subpage.background");
+        setLayout(null);
+        setBackground(UIManager.getColor("background.subpage"));
 
         header.setFont(header.getFont().deriveFont(Font.BOLD));
 
@@ -52,8 +53,6 @@ public class MainPage extends JPanel implements SessionPage {
         });
         currentSubpage = subpages.getFirst();
         add(new JButton());
-
-//        putClientProperty(FlatClientProperties.OUTLINE, "");
     }
 
     private boolean isFirstPage() {
@@ -115,7 +114,7 @@ interface MainSubpage {
 }
 
 class LoginSubpage extends JPanel implements MainSubpage {
-    private static final String ERROR_INVALID_CREDENTIALS = "Please check your credentials.";
+    private static final String SECRET_FILE = "secret";
     private static final String ERROR_OPEN_REGISTRATION = "An error occurred. Please try again.";
 
     private final JPanel displayPanel = new JPanel(new GridBagLayout());
@@ -245,6 +244,9 @@ class LoginSubpage extends JPanel implements MainSubpage {
 
         add(displayPanel);
 
+        rememberBox.setSelected(false);
+        loadCredentials();
+
         revalidate();
         repaint();
     }
@@ -282,33 +284,101 @@ class LoginSubpage extends JPanel implements MainSubpage {
         nextButton.setFont(registerButton.getFont());
     }
 
+    private void saveCredentials(String user, String token) {
+        new Thread(() -> {
+            String credentials = Base64.getEncoder().encodeToString((user + ":" + token).getBytes()).replace("=", "");
+            byte[] encrypted;
+            try {
+                encrypted = AES.encrypt(credentials);
+            } catch (Exception e) {
+                System.err.println("Could not encrypt user secrets.\n" + e);
+                return;
+            }
+
+            try {
+                File output = new File(SECRET_FILE);
+                output.createNewFile();
+                Files.write(output.toPath(), encrypted);
+                System.out.println("Encrypted user secrets.");
+            } catch (IOException e) {
+                System.err.println("Could not store encrypted user secrets.\n" + e);
+            }
+        }).start();
+    }
+
+    private void loadCredentials() {
+        File input = new File(SECRET_FILE);
+        if (!input.exists()) {
+            return;
+        }
+
+        String decrypted;
+        try {
+            decrypted = AES.decrypt(Files.readAllBytes(input.toPath()));
+        } catch (IOException e) {
+            LOGGER.error("Could not read encrypted user secrets from file.", e);
+            return;
+        } catch (Exception e) {
+            LOGGER.error("Could not decrypt user secrets.", e);
+            return;
+        }
+
+        String base64Decoded;
+        try {
+            base64Decoded = new String(Base64.getDecoder().decode(AES.addPadding(decrypted)));
+        } catch (Exception e) {
+            LOGGER.error("Could not base64-decode user secrets.", e);
+            return;
+        }
+
+        String[] splitted = base64Decoded.split(":");
+        if (splitted.length != 2) {
+            LOGGER.error("User secret length is invalid (x{})", splitted.length);
+            return;
+        }
+
+        usernameField.setText(splitted[0]);
+        tokenField.setText(splitted[1]);
+        rememberBox.setSelected(true);
+    }
+
     @Override
     public void canMoveOn(Runnable onSuccess) {
         nextButton.setEnabled(false);
         nextButton.setText("Checking...");
 
-        FRC.setAuth(usernameField.getText(), String.valueOf(tokenField.getPassword()));
-        new Thread(() -> {
+        String storedUsername = usernameField.getText();
+        String storedPassword = String.valueOf(tokenField.getPassword());
 
-            Integer code = FRC.checkCredentials();
-            credentialErrorLabel.setVisible(code!=200);
+        FRC.setAuth(storedUsername, storedPassword);
+        new Thread(() -> {
+            try {
+                Integer code = FRC.checkCredentials();
+                credentialErrorLabel.setVisible(code!=200);
+
+                switch (code) {
+                    case 0 : credentialErrorLabel.setText("Please check your internet connection."); break;
+                    case 200:
+                        if (rememberBox.isSelected()) {
+                            saveCredentials(storedUsername, storedPassword);
+                        } else {
+                            File output = new File(SECRET_FILE);
+                            if (output.exists()) {
+                                output.delete();
+                            }
+                        }
+                        onSuccess.run();
+                        break;
+                    case 401: credentialErrorLabel.setText("Invalid credentials."); break;
+                    case 408 | 500: credentialErrorLabel.setText("Please try again."); break;
+                    default: credentialErrorLabel.setText("Unknown error (" + code + ")"); break;
+                }
+            } catch (Exception e) {
+                System.err.println("Could not authenticate user secrets.\n" + e);
+            }
 
             nextButton.setEnabled(true);
             nextButton.setText("Login");
-
-            switch (code) {
-                case 0 : credentialErrorLabel.setText("Please check your internet connection."); break;
-                case 200: onSuccess.run(); break;
-                case 401: credentialErrorLabel.setText("Invalid credentials."); break;
-                case 408 | 500: credentialErrorLabel.setText("Please try again."); break;
-                default: credentialErrorLabel.setText("Unknown error (" + code + ")"); break;
-            }
-
-//            if (!result) {
-//                credentialErrorLabel.setText(ERROR_INVALID_CREDENTIALS);
-//                credentialErrorLabel.setForeground(UIManager.getColor("errorColor"));
-//            }
-
 
         }).start();
     }

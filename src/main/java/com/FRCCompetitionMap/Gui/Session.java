@@ -1,33 +1,32 @@
 package com.FRCCompetitionMap.Gui;
 
+import com.FRCCompetitionMap.Gui.CustomComponents.GradientPanel;
 import com.FRCCompetitionMap.Gui.Themes.ThemeDark;
 import com.formdev.flatlaf.FlatLaf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.EventQueue;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Session extends JFrame implements ActionListener, WindowListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(Session.class);
     private final List<SessionPage> pages = new ArrayList<>();
     private final MainPage mainPage = new MainPage(() -> LOGGER.debug("Last page!"));
+    private final GradientPanel gradientBackground = new GradientPanel();
     private final Timer runtime;
 
     public Session() {
         super("FRC Competition Map");
         runtime = new Timer(1000/30, this);
 
+        JFrame.setDefaultLookAndFeelDecorated(false);
         setLayout(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setMinimumSize(new Dimension((int)(SessionUtils.SCREEN_SIZE.getWidth()), (int)(SessionUtils.SCREEN_SIZE.getHeight()*0.6)));
@@ -35,7 +34,10 @@ public class Session extends JFrame implements ActionListener, WindowListener {
         setSize(getMinimumSize());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        gradientBackground.setLocation(0, 0);
+
         add(mainPage);
+        add(gradientBackground);
         addWindowListener(this);
 
         revalidate();
@@ -85,6 +87,7 @@ public class Session extends JFrame implements ActionListener, WindowListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(runtime)) {
+            gradientBackground.setSize(getSize());
             updateAll();
             repaint();
         }
@@ -118,4 +121,9 @@ public class Session extends JFrame implements ActionListener, WindowListener {
 
     @Override
     public void windowDeactivated(WindowEvent e) {}
+
+    @Override
+    public void paintComponents(Graphics g) {
+        super.paintComponents(g);
+    }
 }

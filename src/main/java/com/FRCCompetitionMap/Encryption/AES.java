@@ -14,7 +14,7 @@ public class AES {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
     private static final Base64.Decoder DECODER = Base64.getDecoder();
 
-    private static String addPadding(String unpadded) {
+    public static String addPadding(String unpadded) {
         if (unpadded.length() % 4 != 0) {
             unpadded += "=".repeat(4 - unpadded.length() % 4); // Add padding
         }
