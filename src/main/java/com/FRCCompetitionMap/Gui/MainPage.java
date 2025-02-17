@@ -3,11 +3,11 @@ package com.FRCCompetitionMap.Gui;
 import com.FRCCompetitionMap.Encryption.AES;
 import com.FRCCompetitionMap.Gui.CustomComponents.RoundedPanel;
 import com.FRCCompetitionMap.Requests.FRC.FRC;
+import com.FRCCompetitionMap.Requests.FRC.ParsedData.SeasonSummary;
+import com.FRCCompetitionMap.Requests.LoggedThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -389,7 +389,7 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
     }
 
     private void saveCredentials(String user, String token) {
-        new Thread(() -> {
+        new LoggedThread(getClass(), () -> {
             String credentials = Base64.getEncoder().encodeToString((user + ":" + token).getBytes()).replace("=", "");
             byte[] encrypted;
             try {
@@ -454,7 +454,7 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
         String storedUsername = usernameField.getText();
         String storedPassword = String.valueOf(tokenField.getPassword());
 
-        new Thread(() -> {
+        new LoggedThread(getClass(), () -> {
             try {
                 int code;
                 if (FRC.compareAuth(storedUsername, storedPassword)) {
@@ -499,11 +499,11 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
 }
 
 class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
-    private static final String[] whitelistedSeasons = {"2024", "2023", "2022", "2021", "2020"};
+    private static final int[] whitelistedSeasons = {2024, 2023, 2022, 2021, 2020};
 
     private final JButton nextButton = new JButton("Next"), prevButton = new JButton("Back");
 
-    private final Hashtable<String, String> loadedData = new Hashtable<>();
+    private final Hashtable<Integer, String> loadedData = new Hashtable<>();
 
     private final JLabel seasonsHeader = new JLabel("Choose a season to view");
     private final DefaultListModel<String> listModel = new DefaultListModel<>();
@@ -512,7 +512,7 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
 
     private Thread loadingJob = null;
 
-    private String selectedSeason = null;
+    private Integer selectedSeason = null;
 
     private boolean focusedPage = false;
 
@@ -537,7 +537,12 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
             if (!e.getValueIsAdjusting()) {
                 return;
             }
-            selectedSeason = list.getSelectedValue();
+            for(Map.Entry<Integer, String> entry : loadedData.entrySet()){
+                if(entry.getValue().equals(list.getSelectedValue())){
+                    selectedSeason = entry.getKey();
+                    break;
+                }
+            }
             nextButton.setEnabled(true);
         });
         list.setFocusable(false);
@@ -574,14 +579,21 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
     }
 
     private void loadData() {
-        if (loadingJob != null && loadingJob.isAlive()) {
+        if (loadingJob != null && !loadingJob.isInterrupted()) {
             return;
         }
         listModel.removeAllElements();
-        loadingJob = new Thread(() -> {
+        loadingJob = new LoggedThread(getClass(), () -> {
             setLoading(true);
-//            for ()
-//            setLoading(false);
+            for (int whitelistedSeason : whitelistedSeasons) {
+                if (Thread.interrupted()) {
+                    break;
+                }
+                String name = SeasonSummary.getSeasonName(whitelistedSeason);
+                loadedData.put(whitelistedSeason, "[" + whitelistedSeason + "] " + name);
+                listModel.addElement(loadedData.get(whitelistedSeason));
+            }
+            setLoading(false);
             Thread.currentThread().interrupt();
         });
         loadingJob.start();
@@ -605,7 +617,8 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
 
             seasonsHeader.setFont(seasonsHeader.getFont().deriveFont(fontSize*0.75f));
 
-            list.setFont(list.getFont().deriveFont(fontSize));
+            list.setFont(list.getFont().deriveFont(fontSize/2));
+            list.setFixedCellWidth(scrollPane.getWidth());
 
             prevButton.setFont(prevButton.getFont().deriveFont(prevButton.getWidth()*0.1f));
             nextButton.setFont(prevButton.getFont());
@@ -613,7 +626,7 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
         });
     }
 
-    public String getSelectedSeason() {
+    public Integer getSelectedSeason() {
         return selectedSeason;
     }
 
@@ -635,6 +648,7 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
 
     @Override
     public void canMoveOn(Runnable onSuccess) {
+        System.out.println("User chose " + selectedSeason);
     }
 
     @Override
@@ -645,5 +659,46 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
     @Override
     public JButton lastButton() {
         return prevButton;
+    }
+}
+
+class DistrictSelectionSubpage extends SubpageTemplate implements MainSubpage{
+    public DistrictSelectionSubpage() {
+        super(new GridBagLayout());
+    }
+
+    @Override
+    public String getHeader() {
+        return "District";
+    }
+
+    @Override
+    public void update() {
+
+    }
+
+    @Override
+    public void setFocusedPage(boolean focused) {
+
+    }
+
+    @Override
+    public boolean isFocusedPage() {
+        return false;
+    }
+
+    @Override
+    public JPanel getDisplayPanel() {
+        return null;
+    }
+
+    @Override
+    public void canMoveOn(Runnable onSuccess) {
+
+    }
+
+    @Override
+    public JButton nextButton() {
+        return null;
     }
 }

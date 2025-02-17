@@ -1,5 +1,7 @@
 package com.FRCCompetitionMap.Requests.FRC;
 
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,5 +89,9 @@ public class FRC {
 
     public static Object[] searchEventListings(int season, String defaultValue) {
         return get("/%s/events".formatted(season), defaultValue);
+    }
+
+    public static Object[] getSeasonSummary(int season, String defaultValue) {
+        return get("/%s".formatted(season), defaultValue);
     }
 }
