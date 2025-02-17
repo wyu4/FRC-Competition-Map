@@ -1,5 +1,6 @@
 package com.FRCCompetitionMap.Requests.FRC;
 
+import com.FRCCompetitionMap.Requests.RequestTuple;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import org.slf4j.Logger;
@@ -35,18 +36,18 @@ public class FRC {
         return Base64.getEncoder().encodeToString((username + ":" + token).getBytes());
     }
 
-    public static Object[] get(String endpoint, String defaultValue) {
+    public static RequestTuple get(String endpoint, String defaultValue) {
         return get(endpoint, AUTH, defaultValue);
     }
 
-    public static Object[] get(String endpoint, String auth, String defaultValue) {
+    public static RequestTuple get(String endpoint, String auth, String defaultValue) {
         Long startTime = System.currentTimeMillis();
         URL url;
         try {
             url = URI.create(API + endpoint).toURL();
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            return new String[] {"0", "{}"};
+            return new RequestTuple(0, defaultValue);
         }
 
         int responseCode = 0;
@@ -71,27 +72,31 @@ public class FRC {
             result = new StringBuilder(defaultValue);
         }
         System.out.println("[FRC] GET REQUEST to \"" + endpoint + "\" in "  + ((System.currentTimeMillis() - startTime) / 1000f) + " seconds.");
-        return new Object[] {responseCode, result.toString()};
+        return new RequestTuple(responseCode, result.toString());
     }
 
     public static Integer checkCredentials(String username, String token) {
-        Object[] results = get("/", encryptAuth(username, token), "{}");
-        return Integer.parseInt(results[0].toString());
+        RequestTuple results = get("/", encryptAuth(username, token), "{}");
+        return results.getCode();
     }
 
-    public static Object[] searchPlayoffBracket(int season, String event, String defaultValue) {
+    public static RequestTuple searchPlayoffBracket(int season, String event, String defaultValue) {
         return get("/%s/matches/%s?tournamentLevel=Playoff".formatted(season, event), defaultValue);
     }
 
-    public static Object[] searchAllianceSelection(int season, String event, String defaultValue) {
+    public static RequestTuple searchAllianceSelection(int season, String event, String defaultValue) {
         return get("/%s/alliances/%s".formatted(season, event), defaultValue);
     }
 
-    public static Object[] searchEventListings(int season, String defaultValue) {
+    public static RequestTuple searchDistricts(int season, String defaultValue) {
+        return get("/%s/districts".formatted(season), defaultValue);
+    }
+
+    public static RequestTuple searchEventListings(int season, String defaultValue) {
         return get("/%s/events".formatted(season), defaultValue);
     }
 
-    public static Object[] getSeasonSummary(int season, String defaultValue) {
+    public static RequestTuple getSeasonSummary(int season, String defaultValue) {
         return get("/%s".formatted(season), defaultValue);
     }
 }

@@ -22,7 +22,8 @@ public class MainPage extends RoundedPanel implements SessionComponents {
     private final JLabel header = new JLabel("HEADER");
     private final List<MainSubpage> subpages = List.of(
             new LoginSubpage(),
-            new SeasonSelectionSubpage()
+            new SeasonSelectionSubpage(),
+            new EventFilterSubpage()
     );
     private final Runnable onEnd;
 
@@ -168,6 +169,8 @@ class SubpageTemplate extends JPanel {
     public SubpageTemplate(LayoutManager layout) {
         super(null);
 
+        setBackground(UIManager.getColor("invisible"));
+
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -254,8 +257,6 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
 
     public LoginSubpage() {
         super(new GridBagLayout());
-
-        setBackground(UIManager.getColor("invisible"));
 
         usernameField.setHorizontalAlignment(SwingConstants.CENTER);
         tokenField.setHorizontalAlignment(SwingConstants.CENTER);
@@ -519,15 +520,6 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
     public SeasonSelectionSubpage() {
         super(new GridBagLayout());
 
-        setBackground(UIManager.getColor("invisible"));
-
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                requestFocusInWindow();
-            }
-        });
-
         seasonsHeader.setFont(seasonsHeader.getFont().deriveFont(Font.BOLD));
         seasonsHeader.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -589,7 +581,7 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
                 if (Thread.interrupted()) {
                     break;
                 }
-                String name = SeasonSummary.getSeasonName(whitelistedSeason);
+                String name = SeasonSummary.getSeasonName(whitelistedSeason).getParsed();
                 loadedData.put(whitelistedSeason, "[" + whitelistedSeason + "] " + name);
                 listModel.addElement(loadedData.get(whitelistedSeason));
             }
@@ -648,7 +640,9 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
 
     @Override
     public void canMoveOn(Runnable onSuccess) {
-        System.out.println("User chose " + selectedSeason);
+        if (selectedSeason != null) {
+            onSuccess.run();
+        }
     }
 
     @Override
@@ -662,9 +656,38 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
     }
 }
 
-class DistrictSelectionSubpage extends SubpageTemplate implements MainSubpage{
-    public DistrictSelectionSubpage() {
+class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
+    private final JLabel districtHeader = new JLabel("Available Districts");
+
+    private final DefaultListModel<JPanel> listModel = new DefaultListModel<>();
+    private final JList<JPanel> list = new JList<>(listModel);
+    private final JScrollPane scrollPane = new JScrollPane(list);
+
+    public EventFilterSubpage() {
         super(new GridBagLayout());
+
+        districtHeader.setFont(districtHeader.getFont().deriveFont(Font.BOLD));
+        districtHeader.setHorizontalAlignment(SwingConstants.CENTER);
+
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+
+        list.setFocusable(false);
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.gridwidth = 2; constraints.gridheight = 1;
+
+        constraints.gridx = 1; constraints.gridy = 1;
+        constraints.weightx = 1; constraints.weighty = 0.2;
+        constraints.insets = new Insets(defaultInsets.top, defaultInsets.left, defaultInsets.bottom/2, defaultInsets.right);
+        addToDisplay(districtHeader, constraints);
+
+        constraints.gridy = 2;
+        constraints.weighty = 2;
+        constraints.insets = defaultInsets;
+        addToDisplay(scrollPane, constraints);
     }
 
     @Override
@@ -674,7 +697,11 @@ class DistrictSelectionSubpage extends SubpageTemplate implements MainSubpage{
 
     @Override
     public void update() {
-
+        templateUpdate(() -> {
+            districtHeader.setFont(districtHeader.getFont().deriveFont(fontSize));
+            list.setFixedCellHeight(scrollPane.getHeight());
+            list.setFixedCellWidth((int)(list.getFixedCellHeight()*0.6f));
+        });
     }
 
     @Override

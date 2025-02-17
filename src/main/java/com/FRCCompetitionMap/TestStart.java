@@ -1,7 +1,7 @@
 package com.FRCCompetitionMap;
 
 import com.FRCCompetitionMap.Gui.Session;
-import com.FRCCompetitionMap.Requests.RequestTest;
+import com.FRCCompetitionMap.Requests.FRC.ParsedData.DistrictData.SeasonDistricts;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,17 +14,11 @@ public class TestStart {
     private static final List<Runnable> listedTasks = new ArrayList<>();
 
     public static void main(String[] args) {
-        tasks.put("Request Test", () -> {
-            try {
-                RequestTest.main(args);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
         tasks.put("Start", () -> Start.main(args));
 
         tasks.put("Pre-Authenticated Session", () -> Session.startSession(1));
+
+        tasks.put("Parse districts", () -> System.out.println(SeasonDistricts.getDistricts(2024)));
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Input (0-" + (tasks.size()-1) + ")");
