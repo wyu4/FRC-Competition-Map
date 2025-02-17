@@ -19,14 +19,26 @@ public class FRC {
     public static final String API_REGISTRATION = "https://frc-events.firstinspires.org/services/api/register";
     private static final Logger LOGGER = LoggerFactory.getLogger(FRC.class);
     private static final String API = "https://frc-api.firstinspires.org/v3.0";
-    private static String AUTH;
+    private static String AUTH = "";
 
     public static void setAuth(String username, String token) {
-        AUTH = Base64.getEncoder().encodeToString((username + ":" + token).getBytes());
+        AUTH = encryptAuth(username, token);
     }
 
+    public static boolean compareAuth(String username, String token) {
+        return AUTH.equals(encryptAuth(username, token));
+    }
+
+    private static String encryptAuth(String username, String token) {
+        return Base64.getEncoder().encodeToString((username + ":" + token).getBytes());
+    }
 
     public static Object[] get(String endpoint, String defaultValue) {
+        return get(endpoint, AUTH, defaultValue);
+    }
+
+    public static Object[] get(String endpoint, String auth, String defaultValue) {
+        Long startTime = System.currentTimeMillis();
         URL url;
         try {
             url = URI.create(API + endpoint).toURL();
@@ -41,7 +53,7 @@ public class FRC {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json");
-            connection.setRequestProperty("Authorization", "Basic " + AUTH);
+            connection.setRequestProperty("Authorization", "Basic " + auth);
 
             responseCode = connection.getResponseCode();
 
@@ -56,12 +68,12 @@ public class FRC {
             LOGGER.error(e.getMessage());
             result = new StringBuilder(defaultValue);
         }
-
+        System.out.println("[FRC] GET REQUEST to \"" + endpoint + "\" in "  + ((System.currentTimeMillis() - startTime) / 1000f) + " seconds.");
         return new Object[] {responseCode, result.toString()};
     }
 
-    public static Integer checkCredentials() {
-        Object[] results = get("/", "{}");
+    public static Integer checkCredentials(String username, String token) {
+        Object[] results = get("/", encryptAuth(username, token), "{}");
         return Integer.parseInt(results[0].toString());
     }
 

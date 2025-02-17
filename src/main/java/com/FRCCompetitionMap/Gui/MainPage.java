@@ -6,12 +6,14 @@ import com.FRCCompetitionMap.Requests.FRC.FRC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Base64;
+import java.util.*;
 import java.util.List;
 
 public class MainPage extends RoundedPanel implements SessionComponents {
@@ -143,6 +145,13 @@ class SubpageTemplate extends JPanel {
     protected final JPanel displayPanel;
     protected final Insets defaultInsets = new Insets((int)(SessionUtils.SCREEN_SIZE.getHeight()*0.001f), (int)(SessionUtils.SCREEN_SIZE.getWidth()*0.01f), (int)(SessionUtils.SCREEN_SIZE.getHeight()*0.001f), (int)(SessionUtils.SCREEN_SIZE.getWidth()*0.01f));
 
+    private final JPanel loadingPanel = new JPanel(new GridBagLayout());
+    private final JLabel loadingJlabel = new JLabel("Loading...");
+    private Point loadingLocation = null;
+    private Dimension loadingSize = null;
+
+    protected float fontSize = 0;
+
     protected final KeyListener textFieldUnfocusor = new KeyListener() {
         @Override
         public void keyTyped(KeyEvent e) {}
@@ -166,9 +175,19 @@ class SubpageTemplate extends JPanel {
             }
         });
 
+        loadingPanel.setBackground(UIManager.getColor("background.loading"));
+        loadingJlabel.setFont(loadingJlabel.getFont().deriveFont(Font.BOLD));
+
         displayPanel = new JPanel(layout);
         displayPanel.setBackground(UIManager.getColor("invisible"));
-        super.add(displayPanel);
+
+        GridBagConstraints loadingConstraints = new GridBagConstraints();
+        loadingConstraints.insets = defaultInsets;
+        loadingPanel.add(loadingJlabel, loadingConstraints);
+        loadingPanel.setVisible(false);
+
+        add(loadingPanel);
+        add(displayPanel);
     }
 
     public void addToDisplay(Component comp, Object constraints) {
@@ -191,10 +210,29 @@ class SubpageTemplate extends JPanel {
             return;
         }
 
+        fontSize = getWidth()*0.05f;
+
         displayPanel.setSize(getSize());
         displayPanel.setLocation(-getX(), 0);
 
+        loadingPanel.setSize(loadingSize == null ? displayPanel.getSize() : loadingSize);
+        loadingPanel.setLocation(loadingLocation == null ? displayPanel.getLocation() : loadingLocation);
+
+        loadingJlabel.setFont(loadingJlabel.getFont().deriveFont(fontSize*2));
+
         customTask.run();
+    }
+
+    protected void setLoading(boolean loading) {
+        loadingPanel.setVisible(loading);
+    }
+
+    protected void setLoadingLocation(Point p) {
+        loadingLocation = p;
+    }
+
+    protected void setLoadingSize(Dimension size) {
+        loadingSize = size;
     }
 }
 
@@ -268,14 +306,17 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
 
         constraints.weighty = 1;
         constraints.gridy = 2;
+        constraints.insets.top = 0;
         addToDisplay(usernameField, constraints);
 
         constraints.weighty = 1.2;
         constraints.gridy = 3;
+        constraints.insets = defaultInsets;
         addToDisplay(tokenHeader, constraints);
 
         constraints.weighty = 1;
         constraints.gridy = 4;
+        constraints.insets.top = 0;
         addToDisplay(tokenField, constraints);
 
         constraints.weightx = 0.1; constraints.weighty = 0.5;
@@ -320,8 +361,6 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
     @Override
     public void update() {
         templateUpdate(() -> {
-            final float fontSize = getWidth()*0.05f;
-
             usernameHeader.setFont(usernameHeader.getFont().deriveFont(fontSize));
             usernameField.setFont(usernameField.getFont().deriveFont(fontSize*0.9f));
             tokenHeader.setFont(tokenHeader.getFont().deriveFont(fontSize));
@@ -364,10 +403,10 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
                 File output = new File(SECRET_FILE);
                 output.createNewFile();
                 Files.write(output.toPath(), encrypted);
-                System.out.println("Encrypted user secrets.");
             } catch (IOException e) {
                 System.err.println("Could not store encrypted user secrets.\n" + e);
             }
+            Thread.currentThread().interrupt();
         }).start();
     }
 
@@ -415,15 +454,20 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
         String storedUsername = usernameField.getText();
         String storedPassword = String.valueOf(tokenField.getPassword());
 
-        FRC.setAuth(storedUsername, storedPassword);
         new Thread(() -> {
             try {
-                Integer code = FRC.checkCredentials();
+                int code;
+                if (FRC.compareAuth(storedUsername, storedPassword)) {
+                    code = 200;
+                } else {
+                    code = FRC.checkCredentials(storedUsername, storedPassword);
+                }
                 credentialErrorLabel.setVisible(code!=200);
 
                 switch (code) {
                     case 0 : credentialErrorLabel.setText("Please check your internet connection."); break;
                     case 200:
+                        FRC.setAuth(storedUsername, storedPassword);
                         if (rememberBox.isSelected()) {
                             saveCredentials(storedUsername, storedPassword);
                         } else {
@@ -444,7 +488,7 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
 
             nextButton.setEnabled(true);
             nextButton.setText("Login");
-
+            Thread.currentThread().interrupt();
         }).start();
     }
 
@@ -455,12 +499,20 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
 }
 
 class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
+    private static final String[] whitelistedSeasons = {"2024", "2023", "2022", "2021", "2020"};
+
     private final JButton nextButton = new JButton("Next"), prevButton = new JButton("Back");
 
-    private Integer[] seasons = {2022, 2023, 2024};
+    private final Hashtable<String, String> loadedData = new Hashtable<>();
 
-    private final JList<Integer> list = new JList<>(seasons);
+    private final JLabel seasonsHeader = new JLabel("Choose a season to view");
+    private final DefaultListModel<String> listModel = new DefaultListModel<>();
+    private final JList<String> list = new JList<>(listModel);
     private final JScrollPane scrollPane = new JScrollPane(list);
+
+    private Thread loadingJob = null;
+
+    private String selectedSeason = null;
 
     private boolean focusedPage = false;
 
@@ -476,13 +528,63 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
             }
         });
 
+        seasonsHeader.setFont(seasonsHeader.getFont().deriveFont(Font.BOLD));
+        seasonsHeader.setHorizontalAlignment(SwingConstants.CENTER);
+
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        list.addListSelectionListener((e) -> {
+            if (!e.getValueIsAdjusting()) {
+                return;
+            }
+            selectedSeason = list.getSelectedValue();
+            nextButton.setEnabled(true);
+        });
+        list.setFocusable(false);
+
+        nextButton.setEnabled(false);
+        prevButton.setFont(prevButton.getFont().deriveFont(Font.BOLD));
+        nextButton.setFont(nextButton.getFont().deriveFont(Font.BOLD));
+
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.BOTH;
-        constraints.insets = defaultInsets;
-        constraints.gridx = 1; constraints.gridy = 1;
-        constraints.weightx = 1; constraints.weighty=1;
+        constraints.gridwidth = 2; constraints.gridheight = 1;
 
+        constraints.gridx = 1; constraints.gridy = 1;
+        constraints.weightx = 1; constraints.weighty=0.2;
+        constraints.insets = new Insets(defaultInsets.top/2, defaultInsets.left, defaultInsets.bottom/2, defaultInsets.right);
+        addToDisplay(seasonsHeader, constraints);
+
+        constraints.gridy = 2;
+        constraints.weighty=1;
+        constraints.insets = new Insets(defaultInsets.top, defaultInsets.left*3, defaultInsets.bottom, defaultInsets.right*3);
         addToDisplay(scrollPane, constraints);
+
+        constraints.gridy = 3;
+        constraints.gridwidth = 1;
+        constraints.weighty=0.2;
+        constraints.insets = new Insets(defaultInsets.top*10, defaultInsets.left*2, defaultInsets.bottom*50, defaultInsets.right/3);
+        addToDisplay(prevButton, constraints);
+
+        constraints.gridx = 2; constraints.gridy = 3;
+        constraints.gridwidth = 1;
+        constraints.weighty=0.2;
+        constraints.insets = new Insets(defaultInsets.top*10, defaultInsets.left/3, defaultInsets.bottom*50, defaultInsets.right*2);
+        addToDisplay(nextButton, constraints);
+    }
+
+    private void loadData() {
+        if (loadingJob != null && loadingJob.isAlive()) {
+            return;
+        }
+        listModel.removeAllElements();
+        loadingJob = new Thread(() -> {
+            setLoading(true);
+//            for ()
+//            setLoading(false);
+            Thread.currentThread().interrupt();
+        });
+        loadingJob.start();
     }
 
     @Override
@@ -493,13 +595,26 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
     @Override
     public void update() {
         templateUpdate(() -> {
+            setLoadingLocation(scrollPane.getLocation());
+            setLoadingSize(scrollPane.getSize());
 
-            if (seasons == null) {
+            if (listModel.isEmpty()) {
+                loadData();
                 return;
             }
 
-//            list.setFixedCellHeight(list.getHeight()/seasons.length);
+            seasonsHeader.setFont(seasonsHeader.getFont().deriveFont(fontSize*0.75f));
+
+            list.setFont(list.getFont().deriveFont(fontSize));
+
+            prevButton.setFont(prevButton.getFont().deriveFont(prevButton.getWidth()*0.1f));
+            nextButton.setFont(prevButton.getFont());
+
         });
+    }
+
+    public String getSelectedSeason() {
+        return selectedSeason;
     }
 
     @Override
