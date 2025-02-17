@@ -25,8 +25,19 @@ public class MainPage extends RoundedPanel implements SessionComponents {
     private final Runnable onEnd;
 
     public MainPage(Runnable onEnd) {
+        this(0, onEnd);
+    }
+
+    public MainPage(int startPage, Runnable onEnd) {
         super();
         this.onEnd = onEnd;
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                requestFocusInWindow();
+            }
+        });
 
         setLayout(null);
         setBackground(UIManager.getColor("background.subpage"));
@@ -60,7 +71,7 @@ public class MainPage extends RoundedPanel implements SessionComponents {
             }
             add((Component) page);
         });
-        setPage(subpages.getFirst());
+        setPage(subpages.get(startPage));
         add(new JButton());
     }
 
@@ -130,9 +141,31 @@ interface MainSubpage {
 
 class SubpageTemplate extends JPanel {
     protected final JPanel displayPanel;
+    protected final Insets defaultInsets = new Insets((int)(SessionUtils.SCREEN_SIZE.getHeight()*0.001f), (int)(SessionUtils.SCREEN_SIZE.getWidth()*0.01f), (int)(SessionUtils.SCREEN_SIZE.getHeight()*0.001f), (int)(SessionUtils.SCREEN_SIZE.getWidth()*0.01f));
+
+    protected final KeyListener textFieldUnfocusor = new KeyListener() {
+        @Override
+        public void keyTyped(KeyEvent e) {}
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                requestFocusInWindow();
+            }
+        }
+        @Override
+        public void keyReleased(KeyEvent e) {}
+    };
 
     public SubpageTemplate(LayoutManager layout) {
         super(null);
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                requestFocusInWindow();
+            }
+        });
+
         displayPanel = new JPanel(layout);
         displayPanel.setBackground(UIManager.getColor("invisible"));
         super.add(displayPanel);
@@ -159,7 +192,7 @@ class SubpageTemplate extends JPanel {
         }
 
         displayPanel.setSize(getSize());
-        displayPanel.setLocation(0, 0);
+        displayPanel.setLocation(-getX(), 0);
 
         customTask.run();
     }
@@ -179,39 +212,18 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
 
     private final JButton nextButton = new JButton("Login"), registerButton = new JButton("Register");
 
-    private boolean focusedPage;
-
-    private final KeyListener unfocuser = new KeyListener() {
-        @Override
-        public void keyTyped(KeyEvent e) {}
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                requestFocusInWindow();
-            }
-        }
-        @Override
-        public void keyReleased(KeyEvent e) {}
-    };
+    private boolean focusedPage = false;
 
     public LoginSubpage() {
         super(new GridBagLayout());
-        focusedPage = false;
 
         setBackground(UIManager.getColor("invisible"));
-
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                requestFocusInWindow();
-            }
-        });
 
         usernameField.setHorizontalAlignment(SwingConstants.CENTER);
         tokenField.setHorizontalAlignment(SwingConstants.CENTER);
 
-        usernameField.addKeyListener(unfocuser);
-        tokenField.addKeyListener(unfocuser);
+        usernameField.addKeyListener(textFieldUnfocusor);
+        tokenField.addKeyListener(textFieldUnfocusor);
 
         usernameHeader.setFont(usernameHeader.getFont().deriveFont(Font.BOLD));
         tokenHeader.setFont(tokenHeader.getFont().deriveFont(Font.BOLD));
@@ -244,7 +256,6 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
         });
 
         GridBagConstraints constraints = new GridBagConstraints();
-        Insets defaultInsets = new Insets((int)(SessionUtils.SCREEN_SIZE.getHeight()*0.001f), (int)(SessionUtils.SCREEN_SIZE.getWidth()*0.01f), (int)(SessionUtils.SCREEN_SIZE.getHeight()*0.001f), (int)(SessionUtils.SCREEN_SIZE.getWidth()*0.01f));
 
         constraints.weightx = 1;
         constraints.weighty = 1.2;
@@ -446,12 +457,15 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
 class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
     private final JButton nextButton = new JButton("Next"), prevButton = new JButton("Back");
 
+    private Integer[] seasons = {2022, 2023, 2024};
 
-    private boolean focusedPage;
+    private final JList<Integer> list = new JList<>(seasons);
+    private final JScrollPane scrollPane = new JScrollPane(list);
+
+    private boolean focusedPage = false;
 
     public SeasonSelectionSubpage() {
-        super(null);
-        focusedPage = false;
+        super(new GridBagLayout());
 
         setBackground(UIManager.getColor("invisible"));
 
@@ -461,6 +475,14 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
                 requestFocusInWindow();
             }
         });
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.insets = defaultInsets;
+        constraints.gridx = 1; constraints.gridy = 1;
+        constraints.weightx = 1; constraints.weighty=1;
+
+        addToDisplay(scrollPane, constraints);
     }
 
     @Override
@@ -472,6 +494,11 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
     public void update() {
         templateUpdate(() -> {
 
+            if (seasons == null) {
+                return;
+            }
+
+//            list.setFixedCellHeight(list.getHeight()/seasons.length);
         });
     }
 

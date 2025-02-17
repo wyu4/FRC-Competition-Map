@@ -19,14 +19,20 @@ import java.util.List;
 public class Session extends JFrame implements ActionListener, WindowListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(Session.class);
     private final List<SessionComponents> pages = new ArrayList<>();
-    private final MainPage mainPage = new MainPage(() -> LOGGER.debug("Last page!"));
+    private final MainPage mainPage;
     private final GradientPanel gradientBackground = new GradientPanel();
     private final Attribution attribution = new Attribution(ImageLoader.FRC_LOGO);
     private final Timer runtime;
 
     public Session() {
+        this(0);
+    }
+
+    public Session(int pageNumber) {
         super("FRC Competition Map");
         runtime = new Timer(1000/30, this);
+
+        mainPage = new MainPage(pageNumber, () -> LOGGER.debug("Last page!"));
 
         JFrame.setDefaultLookAndFeelDecorated(false);
         setLayout(null);
@@ -65,6 +71,10 @@ public class Session extends JFrame implements ActionListener, WindowListener {
     }
 
     public static void startSession() {
+        startSession(0);
+    }
+
+    public static void startSession(int pageNumber) {
         LOGGER.debug("Starting session.");
         try {
             FlatLaf.registerCustomDefaultsSource("themes");
@@ -80,7 +90,7 @@ public class Session extends JFrame implements ActionListener, WindowListener {
         }
 
         LOGGER.debug("Ready to launch session.");
-        SwingUtilities.invokeLater(Session::new);
+        SwingUtilities.invokeLater(() -> new Session(pageNumber));
     }
 
     private void updateAll() {
