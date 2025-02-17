@@ -33,6 +33,7 @@ public class Session extends JFrame implements ActionListener, WindowListener {
         runtime = new Timer(1000/30, this);
 
         mainPage = new MainPage(pageNumber, () -> LOGGER.debug("Last page!"));
+        mainPage.setDoubleBuffered(true);
 
         JFrame.setDefaultLookAndFeelDecorated(false);
         setLayout(null);

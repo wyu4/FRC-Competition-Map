@@ -16,7 +16,7 @@ public class TestStart {
     public static void main(String[] args) {
         tasks.put("Start", () -> Start.main(args));
 
-        tasks.put("Pre-Authenticated Session", () -> Session.startSession(1));
+        tasks.put("Pre-Authenticated Session", () -> Session.startSession(2));
 
         tasks.put("Parse districts", () -> System.out.println(SeasonDistricts.getDistricts(2024)));
 
@@ -36,7 +36,7 @@ public class TestStart {
             String input = scanner.nextLine();
             try {
                 int parsed = Integer.parseInt(input);
-                if (parsed > 0 && parsed < listedTasks.size()) {
+                if (parsed >= 0 && parsed < listedTasks.size()) {
                     chosenRunnable = listedTasks.get(parsed);
                 } else {
                     throw new NumberFormatException();

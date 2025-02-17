@@ -10,6 +10,12 @@ public class District {
         this.tree = tree;
     }
 
+    public District(String code, String name) {
+        tree = new LinkedTreeMap<>();
+        this.code = code;
+        this.name = name;
+    }
+
     public String getCode() {
         if (code == null) {
             Object raw = tree.get("code");

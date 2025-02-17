@@ -3,11 +3,13 @@ package com.FRCCompetitionMap.Gui;
 import com.FRCCompetitionMap.Encryption.AES;
 import com.FRCCompetitionMap.Gui.CustomComponents.RoundedPanel;
 import com.FRCCompetitionMap.Requests.FRC.FRC;
+import com.FRCCompetitionMap.Requests.FRC.ParsedData.DistrictData.District;
 import com.FRCCompetitionMap.Requests.FRC.ParsedData.SeasonSummary;
 import com.FRCCompetitionMap.Requests.LoggedThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainPage extends RoundedPanel implements SessionComponents {
     private volatile MainSubpage currentSubpage;
@@ -657,11 +660,123 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
 }
 
 class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
+    private static class DistrictPanel extends JPanel {
+        private final District district;
+        private final JLabel header;
+        private final JLabel codeHeader;
+        private final JButton selectButton = new JButton("View");
+
+        public DistrictPanel(District district) {
+            super(new GridBagLayout());
+
+            this.district = district;
+            header = new JLabel(district.getName());
+            header.setFont(header.getFont().deriveFont(Font.BOLD));
+            header.setHorizontalAlignment(SwingConstants.CENTER);
+
+            Insets defaultInsets = new Insets((int)(SessionUtils.SCREEN_SIZE.getHeight()*0.001f), (int)(SessionUtils.SCREEN_SIZE.getWidth()*0.01f), (int)(SessionUtils.SCREEN_SIZE.getHeight()*0.001f), (int)(SessionUtils.SCREEN_SIZE.getWidth()*0.01f));
+
+            setBackground(UIManager.getColor("invisible"));
+            setDoubleBuffered(true);
+
+            codeHeader = new JLabel("[%s]".formatted(district.getCode()));
+            codeHeader.setHorizontalAlignment(SwingConstants.CENTER);
+
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.fill = GridBagConstraints.BOTH;
+            constraints.gridx = 1; constraints.gridy = 1;
+            constraints.weighty = 1;
+            constraints.insets = defaultInsets;
+            add(header, constraints);
+
+            constraints.gridy = 2;
+            constraints.weighty = 0.5f;
+            add(codeHeader, constraints);
+
+            constraints.gridy = 3;
+            constraints.weighty = 0.25f;
+            add(selectButton, constraints);
+
+            setVisible(true);
+        }
+
+        public void update() {
+            final float fontSize = getWidth()*0.075f;
+            header.setFont(header.getFont().deriveFont(fontSize));
+            codeHeader.setFont(header.getFont().deriveFont(fontSize));
+            selectButton.setFont(header.getFont().deriveFont(fontSize));
+        }
+
+        public void addSelectionListener(ActionListener l) {
+            selectButton.addActionListener(l);
+        }
+    }
+
+    private static class DistrictScrollPane extends JScrollPane {
+        private final JPanel contentPane = new JPanel(null);
+        private final List<DistrictPanel> districtPanels = new ArrayList<>();
+        private final List<ActionListener> selectionListeners = new ArrayList<>();
+
+        public DistrictScrollPane() {
+            setDoubleBuffered(true);
+            setBorder(null);
+            setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+            setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+//            contentPane.setBackground(UIManager.getColor("invisible"));
+            contentPane.setDoubleBuffered(true);
+
+            viewport.setLayout(null);
+            viewport.setView(contentPane);
+        }
+
+        private int calculateDistrictPanelWidth() {
+            return (int)(getWidth()*0.6f);
+        }
+
+        public void addDistrict(District district) {
+            DistrictPanel panel = new DistrictPanel(district);
+            districtPanels.add(panel);
+            contentPane.add(panel);
+            for (ActionListener l : selectionListeners) {
+                panel.addSelectionListener(l);
+            }
+        }
+
+        public void updateContentPane() {
+            contentPane.setSize(districtPanels.size()*calculateDistrictPanelWidth(), getHorizontalScrollBar().isVisible() ? getHeight() - getHorizontalScrollBar().getHeight() : getHeight());
+            contentPane.setPreferredSize(contentPane.getSize());
+
+            AtomicInteger index = new AtomicInteger();
+
+            districtPanels.forEach((panel) -> {
+                panel.setSize(calculateDistrictPanelWidth(), contentPane.getHeight());
+                panel.setLocation(index.get() * calculateDistrictPanelWidth(), 0);
+                panel.update();
+                index.addAndGet(1);
+            });
+        }
+
+        public void addSelectionListener(ActionListener l) {
+            selectionListeners.add(l);
+            districtPanels.forEach((panel) -> panel.addSelectionListener(l));
+        }
+    }
+
     private final JLabel districtHeader = new JLabel("Available Districts");
 
-    private final DefaultListModel<JPanel> listModel = new DefaultListModel<>();
-    private final JList<JPanel> list = new JList<>(listModel);
-    private final JScrollPane scrollPane = new JScrollPane(list);
+    private final DistrictScrollPane scrollPane = new DistrictScrollPane();
+
+    private final JButton prevButton = new JButton("Back"), dummyNextButton = new JButton("dummy") {
+        @Override
+        public void addActionListener(ActionListener l) {
+            scrollPane.addSelectionListener(l);
+        }
+    };
+
+    private boolean focusedPage = false;
+
+    private LoggedThread loadingJob = null;
 
     public EventFilterSubpage() {
         super(new GridBagLayout());
@@ -669,11 +784,7 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
         districtHeader.setFont(districtHeader.getFont().deriveFont(Font.BOLD));
         districtHeader.setHorizontalAlignment(SwingConstants.CENTER);
 
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-
-        list.setFocusable(false);
+        prevButton.setFont(prevButton.getFont().deriveFont(Font.BOLD));
 
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.BOTH;
@@ -688,6 +799,24 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
         constraints.weighty = 2;
         constraints.insets = defaultInsets;
         addToDisplay(scrollPane, constraints);
+
+        constraints.gridy = 3;
+        constraints.weighty = 0.1;
+        constraints.insets = new Insets(defaultInsets.top, defaultInsets.left*10, defaultInsets.bottom*4, defaultInsets.right*10);
+        addToDisplay(prevButton, constraints);
+
+        scrollPane.addDistrict(new District("TD", "Test District"));
+        scrollPane.addDistrict(new District("TD2", "Test District 2"));
+
+        revalidate();
+    }
+
+
+
+    @Override
+    protected void setLoading(boolean loading) {
+        prevButton.setEnabled(!loading);
+        super.setLoading(loading);
     }
 
     @Override
@@ -699,19 +828,22 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
     public void update() {
         templateUpdate(() -> {
             districtHeader.setFont(districtHeader.getFont().deriveFont(fontSize));
-            list.setFixedCellHeight(scrollPane.getHeight());
-            list.setFixedCellWidth((int)(list.getFixedCellHeight()*0.6f));
+            scrollPane.updateContentPane();
+            prevButton.setFont(prevButton.getFont().deriveFont(prevButton.getWidth()*0.1f));
+            setLoadingLocation(scrollPane.getLocation());
+            setLoadingSize(scrollPane.getSize());
         });
     }
 
     @Override
     public void setFocusedPage(boolean focused) {
-
+        setVisible(focused);
+        focusedPage = focused;
     }
 
     @Override
     public boolean isFocusedPage() {
-        return false;
+        return focusedPage;
     }
 
     @Override
@@ -721,11 +853,16 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
 
     @Override
     public void canMoveOn(Runnable onSuccess) {
+        onSuccess.run();
+    }
 
+    @Override
+    public JButton lastButton() {
+        return prevButton;
     }
 
     @Override
     public JButton nextButton() {
-        return null;
+        return dummyNextButton;
     }
 }
