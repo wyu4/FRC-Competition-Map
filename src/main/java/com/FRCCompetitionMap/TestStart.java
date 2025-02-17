@@ -1,5 +1,6 @@
 package com.FRCCompetitionMap;
 
+import com.FRCCompetitionMap.Gui.MainPage;
 import com.FRCCompetitionMap.Gui.Session;
 import com.FRCCompetitionMap.Requests.FRC.ParsedData.DistrictData.SeasonDistricts;
 
@@ -16,7 +17,12 @@ public class TestStart {
     public static void main(String[] args) {
         tasks.put("Start", () -> Start.main(args));
 
-        tasks.put("Pre-Authenticated Session", () -> Session.startSession(2));
+        tasks.put("Session Page 1", () -> Session.startSession(1));
+
+        tasks.put("Session Page 2", () -> {
+            MainPage.setTransferredData("season", 2024);
+            Session.startSession(2);
+        });
 
         tasks.put("Parse districts", () -> System.out.println(SeasonDistricts.getDistricts(2024)));
 

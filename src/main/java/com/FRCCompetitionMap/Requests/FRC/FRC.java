@@ -41,7 +41,7 @@ public class FRC {
     }
 
     public static RequestTuple get(String endpoint, String auth, String defaultValue) {
-        Long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         URL url;
         try {
             url = URI.create(API + endpoint).toURL();
@@ -69,6 +69,10 @@ public class FRC {
 
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
+            result = new StringBuilder(defaultValue);
+        }
+        if (result.isEmpty() && !endpoint.equals("/")) {
+            responseCode = 400;
             result = new StringBuilder(defaultValue);
         }
         System.out.println("[FRC] GET REQUEST to \"" + endpoint + "\" in "  + ((System.currentTimeMillis() - startTime) / 1000f) + " seconds.");

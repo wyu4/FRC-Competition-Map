@@ -33,6 +33,14 @@ public class District {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof District d) {
+            return this.toString().equals(d.toString());
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         return "{" + getName() + ":" + getCode() + "}";
     }

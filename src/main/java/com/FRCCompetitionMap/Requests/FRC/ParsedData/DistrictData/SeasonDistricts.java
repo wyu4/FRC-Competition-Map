@@ -10,17 +10,23 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-public class SeasonDistricts {
+public abstract class SeasonDistricts {
     private static final Hashtable<Integer, String> cache = new Hashtable<>();
 
     public static ParsedTuple<List<District>> getDistricts(int season) {
-        RequestTuple response = FRC.searchDistricts(season, "{districts:[]}");
+        RequestTuple response;
+        if (cache.containsKey(season)) {
+            response = new RequestTuple(200, cache.get(season));
+        } else {
+            response = FRC.searchDistricts(season, "{districts:[]}");
+        }
+
         String content;
         if (response.getCode() == 200) {
             content = response.getContent();
             cache.put(season, response.getContent());
         } else {
-            content = cache.get(season) == null ? response.getContent() : cache.get(season);
+            content = cache.containsKey(season) ? cache.get(season) : response.getContent();
         }
 
         LinkedTreeMap<?,?> tree = DataParser.PARSER.fromJson(content, LinkedTreeMap.class);

@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class DataParser {
+public abstract class DataParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataParser.class);
     public static final Gson PARSER = new Gson();
 

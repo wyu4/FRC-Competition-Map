@@ -4,6 +4,8 @@ import com.FRCCompetitionMap.Encryption.AES;
 import com.FRCCompetitionMap.Gui.CustomComponents.RoundedPanel;
 import com.FRCCompetitionMap.Requests.FRC.FRC;
 import com.FRCCompetitionMap.Requests.FRC.ParsedData.DistrictData.District;
+import com.FRCCompetitionMap.Requests.FRC.ParsedData.DistrictData.SeasonDistricts;
+import com.FRCCompetitionMap.Requests.FRC.ParsedData.ParsedTuple;
 import com.FRCCompetitionMap.Requests.FRC.ParsedData.SeasonSummary;
 import com.FRCCompetitionMap.Requests.LoggedThread;
 import org.slf4j.Logger;
@@ -20,6 +22,16 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainPage extends RoundedPanel implements SessionComponents {
+    private static final Hashtable<String, Object> transferredData = new Hashtable<>();
+
+    public static Object getTransferredData(String key) {
+        return transferredData.get(key);
+    }
+
+    public static void setTransferredData(String key, Object value) {
+        transferredData.put(key, value);
+    }
+
     private volatile MainSubpage currentSubpage;
 
     private final JLabel header = new JLabel("HEADER");
@@ -644,6 +656,7 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
     @Override
     public void canMoveOn(Runnable onSuccess) {
         if (selectedSeason != null) {
+            MainPage.setTransferredData("season", selectedSeason);
             onSuccess.run();
         }
     }
@@ -660,6 +673,8 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
 }
 
 class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventFilterSubpage.class);
+
     private static class DistrictPanel extends JPanel {
         private final District district;
         private final JLabel header;
@@ -710,6 +725,14 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
         public void addSelectionListener(ActionListener l) {
             selectButton.addActionListener(l);
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof DistrictPanel panel) {
+                return panel.district.equals(this.district);
+            }
+            return false;
+        }
     }
 
     private static class DistrictScrollPane extends JScrollPane {
@@ -741,6 +764,11 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
             for (ActionListener l : selectionListeners) {
                 panel.addSelectionListener(l);
             }
+        }
+
+        public void clear() {
+            contentPane.removeAll();
+            districtPanels.clear();
         }
 
         public void updateContentPane() {
@@ -805,13 +833,33 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
         constraints.insets = new Insets(defaultInsets.top, defaultInsets.left*10, defaultInsets.bottom*4, defaultInsets.right*10);
         addToDisplay(prevButton, constraints);
 
-        scrollPane.addDistrict(new District("TD", "Test District"));
-        scrollPane.addDistrict(new District("TD2", "Test District 2"));
-
         revalidate();
     }
 
+    public void load() {
+        Object rawSeason = MainPage.getTransferredData("season");
+        if (rawSeason instanceof Integer selectedSeason) {
+            if (loadingJob != null && !loadingJob.isInterrupted()) {
+                LOGGER.error("Cannot create new loading job. Currently handling another job.");
+                return;
+            }
 
+            scrollPane.clear();
+
+            loadingJob = new LoggedThread(getClass(), () -> {
+                setLoading(true);
+
+                ParsedTuple<List<District>> districts = SeasonDistricts.getDistricts(selectedSeason);
+                districts.getParsed().forEach(scrollPane::addDistrict);
+
+                setLoading(false);
+                loadingJob.interrupt();
+            });
+            loadingJob.start();
+        } else {
+            LOGGER.error("Could not get transferred season data ({} : {})", rawSeason, rawSeason.getClass());
+        }
+    }
 
     @Override
     protected void setLoading(boolean loading) {
@@ -839,6 +887,9 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
     public void setFocusedPage(boolean focused) {
         setVisible(focused);
         focusedPage = focused;
+        if (focused) {
+            load();
+        }
     }
 
     @Override
