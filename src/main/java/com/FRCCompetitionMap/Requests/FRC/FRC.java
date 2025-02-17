@@ -96,8 +96,8 @@ public class FRC {
         return get("/%s/districts".formatted(season), defaultValue);
     }
 
-    public static RequestTuple searchEventListings(int season, String defaultValue) {
-        return get("/%s/events".formatted(season), defaultValue);
+    public static RequestTuple searchEventListings(int season, String district, String defaultValue) {
+        return get("/%s/events?districtCode=%s".formatted(season, district), defaultValue);
     }
 
     public static RequestTuple getSeasonSummary(int season, String defaultValue) {

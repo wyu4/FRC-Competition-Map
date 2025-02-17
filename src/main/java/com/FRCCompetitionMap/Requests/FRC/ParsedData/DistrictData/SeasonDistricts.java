@@ -18,7 +18,8 @@ public abstract class SeasonDistricts {
         if (cache.containsKey(season)) {
             response = new RequestTuple(200, cache.get(season));
         } else {
-            response = FRC.searchDistricts(season, "{districts:[]}");
+            response = FRC.searchDistricts(season, "{\"districts\":[]}");
+
         }
 
         String content;

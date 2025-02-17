@@ -24,6 +24,12 @@ public class TestStart {
             Session.startSession(2);
         });
 
+        tasks.put("Session Page 3", () -> {
+            MainPage.setTransferredData("season", 2024);
+            MainPage.setTransferredData("district", "ONT");
+            Session.startSession(3);
+        });
+
         tasks.put("Parse districts", () -> System.out.println(SeasonDistricts.getDistricts(2024)));
 
         Scanner scanner = new Scanner(System.in);

@@ -5,6 +5,8 @@ import com.FRCCompetitionMap.Gui.CustomComponents.RoundedPanel;
 import com.FRCCompetitionMap.Requests.FRC.FRC;
 import com.FRCCompetitionMap.Requests.FRC.ParsedData.DistrictData.District;
 import com.FRCCompetitionMap.Requests.FRC.ParsedData.DistrictData.SeasonDistricts;
+import com.FRCCompetitionMap.Requests.FRC.ParsedData.EventData.DistrictEvents;
+import com.FRCCompetitionMap.Requests.FRC.ParsedData.EventData.Event;
 import com.FRCCompetitionMap.Requests.FRC.ParsedData.ParsedTuple;
 import com.FRCCompetitionMap.Requests.FRC.ParsedData.SeasonSummary;
 import com.FRCCompetitionMap.Requests.LoggedThread;
@@ -25,6 +27,9 @@ public class MainPage extends RoundedPanel implements SessionComponents {
     private static final Hashtable<String, Object> transferredData = new Hashtable<>();
 
     public static Object getTransferredData(String key) {
+        if (!transferredData.containsKey(key)) {
+            return "???";
+        }
         return transferredData.get(key);
     }
 
@@ -38,7 +43,8 @@ public class MainPage extends RoundedPanel implements SessionComponents {
     private final List<MainSubpage> subpages = List.of(
             new LoginSubpage(),
             new SeasonSelectionSubpage(),
-            new EventFilterSubpage()
+            new EventFilterSubpage(),
+            new EventSelectionSubpage()
     );
     private final Runnable onEnd;
 
@@ -515,6 +521,8 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
 }
 
 class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SeasonSelectionSubpage.class);
+
     private static final int[] whitelistedSeasons = {2024, 2023, 2022, 2021, 2020};
 
     private final JButton nextButton = new JButton("Next"), prevButton = new JButton("Back");
@@ -592,13 +600,17 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
         listModel.removeAllElements();
         loadingJob = new LoggedThread(getClass(), () -> {
             setLoading(true);
-            for (int whitelistedSeason : whitelistedSeasons) {
-                if (Thread.interrupted()) {
-                    break;
+            try {
+                for (int whitelistedSeason : whitelistedSeasons) {
+                    if (Thread.interrupted()) {
+                        break;
+                    }
+                    String name = SeasonSummary.getSeasonName(whitelistedSeason).getParsed();
+                    loadedData.put(whitelistedSeason, "[" + whitelistedSeason + "] " + name);
+                    listModel.addElement(loadedData.get(whitelistedSeason));
                 }
-                String name = SeasonSummary.getSeasonName(whitelistedSeason).getParsed();
-                loadedData.put(whitelistedSeason, "[" + whitelistedSeason + "] " + name);
-                listModel.addElement(loadedData.get(whitelistedSeason));
+            } catch (Exception e) {
+                LOGGER.error("Could not load data.", e);
             }
             setLoading(false);
             Thread.currentThread().interrupt();
@@ -608,7 +620,7 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
 
     @Override
     public String getHeader() {
-        return "Season";
+        return "Season Selection";
     }
 
     @Override
@@ -619,22 +631,17 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
 
             if (listModel.isEmpty()) {
                 loadData();
-                return;
             }
 
             seasonsHeader.setFont(seasonsHeader.getFont().deriveFont(fontSize*0.75f));
 
-            list.setFont(list.getFont().deriveFont(fontSize/2));
+            list.setFont(list.getFont().deriveFont(fontSize*0.5f));
             list.setFixedCellWidth(scrollPane.getWidth());
 
             prevButton.setFont(prevButton.getFont().deriveFont(prevButton.getWidth()*0.1f));
             nextButton.setFont(prevButton.getFont());
 
         });
-    }
-
-    public Integer getSelectedSeason() {
-        return selectedSeason;
     }
 
     @Override
@@ -723,7 +730,11 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
         }
 
         public void addSelectionListener(ActionListener l) {
-            selectButton.addActionListener(l);
+            selectButton.addActionListener((e) -> {
+                MainPage.setTransferredData("district", district.getCode());
+                MainPage.setTransferredData("district_name", district.getName());
+                l.actionPerformed(e);
+            });
         }
 
         @Override
@@ -849,13 +860,18 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
             loadingJob = new LoggedThread(getClass(), () -> {
                 setLoading(true);
 
-                ParsedTuple<List<District>> districts = SeasonDistricts.getDistricts(selectedSeason);
-                districts.getParsed().forEach(scrollPane::addDistrict);
+                try {
+                    ParsedTuple<List<District>> districts = SeasonDistricts.getDistricts(selectedSeason);
+                    districts.getParsed().forEach(scrollPane::addDistrict);
+                } catch (Exception e) {
+                    LOGGER.error("Could not load data.", e);
+                }
 
                 setLoading(false);
                 loadingJob.interrupt();
             });
             loadingJob.start();
+
         } else {
             LOGGER.error("Could not get transferred season data ({} : {})", rawSeason, rawSeason.getClass());
         }
@@ -869,7 +885,7 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
 
     @Override
     public String getHeader() {
-        return "District";
+        return "District Selection";
     }
 
     @Override
@@ -899,7 +915,7 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
 
     @Override
     public JPanel getDisplayPanel() {
-        return null;
+        return displayPanel;
     }
 
     @Override
@@ -915,5 +931,175 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
     @Override
     public JButton nextButton() {
         return dummyNextButton;
+    }
+}
+
+class EventSelectionSubpage extends SubpageTemplate implements MainSubpage {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventSelectionSubpage.class);
+
+    private final JLabel header = new JLabel("Competitions");
+    private final JButton prevButton = new JButton("Back"), viewButton = new JButton("View");
+
+    private final Hashtable<String, String> loadedData = new Hashtable<>();
+
+    private final DefaultListModel<String> listModel = new DefaultListModel<>();
+    private final JList<String> list = new JList<>(listModel);
+
+    private final JScrollPane scrollPane = new JScrollPane(list);
+
+    private String selectedCompetition = null;
+
+    private LoggedThread loadingJob = null;
+
+    private boolean focusedPage = false;
+
+    public EventSelectionSubpage() {
+        super(new GridBagLayout());
+
+        header.setFont(header.getFont().deriveFont(Font.BOLD));
+        header.setHorizontalAlignment(SwingConstants.CENTER);
+
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        list.setFocusable(false);
+        list.addListSelectionListener((e) -> {
+            if (!e.getValueIsAdjusting()) {
+                return;
+            }
+            for(Map.Entry<String, String> entry : loadedData.entrySet()){
+                if(entry.getValue().equals(list.getSelectedValue())){
+                    selectedCompetition = entry.getKey();
+                    break;
+                }
+            }
+            viewButton.setEnabled(true);
+        });
+
+        viewButton.setEnabled(false);
+        prevButton.setFont(prevButton.getFont().deriveFont(Font.BOLD));
+        viewButton.setFont(viewButton.getFont().deriveFont(Font.BOLD));
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.gridwidth = 2; constraints.gridheight = 1;
+
+        constraints.gridx = 1; constraints.gridy = 1;
+        constraints.weightx = 1; constraints.weighty=0.2;
+        constraints.insets = new Insets(defaultInsets.top/2, defaultInsets.left, defaultInsets.bottom/2, defaultInsets.right);
+        addToDisplay(header, constraints);
+
+        constraints.gridy = 2;
+        constraints.weighty=1;
+        constraints.insets = new Insets(defaultInsets.top, defaultInsets.left*3, defaultInsets.bottom, defaultInsets.right*3);
+        addToDisplay(scrollPane, constraints);
+
+        constraints.gridy = 3;
+        constraints.gridwidth = 1;
+        constraints.weighty=0.2;
+        constraints.insets = new Insets(defaultInsets.top*10, defaultInsets.left*2, defaultInsets.bottom*50, defaultInsets.right/3);
+        addToDisplay(prevButton, constraints);
+
+        constraints.gridx = 2; constraints.gridy = 3;
+        constraints.gridwidth = 1;
+        constraints.weighty=0.2;
+        constraints.insets = new Insets(defaultInsets.top*10, defaultInsets.left/3, defaultInsets.bottom*50, defaultInsets.right*2);
+        addToDisplay(viewButton, constraints);
+    }
+
+    private void load() {
+        if (MainPage.getTransferredData("district") instanceof String districtCode && MainPage.getTransferredData("season") instanceof Integer season) {
+            if (loadingJob != null && !loadingJob.isInterrupted()) {
+                LOGGER.error("Cannot create new loading job. Currently handling another job.");
+                return;
+            }
+            listModel.removeAllElements();
+            loadingJob = new LoggedThread(getClass(), () -> {
+                setLoading(true);
+
+                try {
+                    ParsedTuple<List<Event>> districtEvents = DistrictEvents.getEvents(season, districtCode);
+                    districtEvents.getParsed().forEach((event) -> {
+                        loadedData.put(event.getCode(), event.getShortenedName());
+                        listModel.addElement(loadedData.get(event.getCode()));
+                        revalidate();
+                    });
+                } catch (Exception e) {
+                    LOGGER.error("Could not load data.", e);
+                }
+
+                setLoading(false);
+                Thread.currentThread().interrupt();
+            });
+            loadingJob.start();
+        } else {
+            LOGGER.error("Could not get transferred data.");
+        }
+    }
+
+    @Override
+    public void update() {
+        templateUpdate(() -> {
+            header.setText("Events @ %s (%s)".formatted(MainPage.getTransferredData("district_name").toString(), MainPage.getTransferredData("season").toString()));
+            header.setFont(header.getFont().deriveFont(fontSize*0.75f));
+
+            list.setFont(list.getFont().deriveFont(fontSize*0.5f));
+            list.setFixedCellWidth(scrollPane.getWidth());
+
+
+            setLoadingSize(scrollPane.getSize());
+            setLoadingLocation(scrollPane.getLocation());
+
+            prevButton.setFont(prevButton.getFont().deriveFont(prevButton.getWidth()*0.1f));
+            viewButton.setFont(prevButton.getFont());
+        });
+    }
+
+    @Override
+    protected void setLoading(boolean loading) {
+        prevButton.setEnabled(!loading);
+        super.setLoading(loading);
+    }
+
+    @Override
+    public void setFocusedPage(boolean focused) {
+        setVisible(focused);
+        focusedPage = focused;
+        if (focused) {
+            load();
+        }
+    }
+
+    @Override
+    public boolean isFocusedPage() {
+        return focusedPage;
+    }
+
+    @Override
+    public JPanel getDisplayPanel() {
+        return null;
+    }
+
+    @Override
+    public void canMoveOn(Runnable onSuccess) {
+        if (selectedCompetition != null) {
+            MainPage.setTransferredData("event", selectedCompetition);
+            onSuccess.run();
+        }
+    }
+
+    @Override
+    public JButton nextButton() {
+        return viewButton;
+    }
+
+    @Override
+    public JButton lastButton() {
+        return prevButton;
+    }
+
+    @Override
+    public String getHeader() {
+        return "Event Selection";
     }
 }
