@@ -135,7 +135,15 @@ class SubpageTemplate extends JPanel {
         super(null);
         displayPanel = new JPanel(layout);
         displayPanel.setBackground(UIManager.getColor("invisible"));
-        add(displayPanel);
+        super.add(displayPanel);
+    }
+
+    public void addToDisplay(Component comp, Object constraints) {
+        displayPanel.add(comp, constraints);
+    }
+
+    public Component addToDisplay(Component comp) {
+        return displayPanel.add(comp);
     }
 
     public void templateUpdate(Runnable customTask) {
@@ -245,46 +253,46 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
         constraints.gridx = 1; constraints.gridy = 1;
         constraints.gridwidth = 2;
         constraints.gridheight = 1;
-        displayPanel.add(usernameHeader, constraints);
+        addToDisplay(usernameHeader, constraints);
 
         constraints.weighty = 1;
         constraints.gridy = 2;
-        displayPanel.add(usernameField, constraints);
+        addToDisplay(usernameField, constraints);
 
         constraints.weighty = 1.2;
         constraints.gridy = 3;
-        displayPanel.add(tokenHeader, constraints);
+        addToDisplay(tokenHeader, constraints);
 
         constraints.weighty = 1;
         constraints.gridy = 4;
-        displayPanel.add(tokenField, constraints);
+        addToDisplay(tokenField, constraints);
 
         constraints.weightx = 0.1; constraints.weighty = 0.5;
         constraints.gridx = 1; constraints.gridy = 5;
         constraints.gridwidth = 1;
         constraints.insets = new Insets(defaultInsets.top, defaultInsets.left, defaultInsets.bottom, 0);
-        displayPanel.add(rememberBox, constraints);
+        addToDisplay(rememberBox, constraints);
 
         constraints.weightx = 2; constraints.weighty = 0.5;
         constraints.gridx = 2; constraints.gridy = 5;
         constraints.insets = new Insets(defaultInsets.top, 0, defaultInsets.bottom, defaultInsets.right);
-        displayPanel.add(rememberLabel, constraints);
+        addToDisplay(rememberLabel, constraints);
 
         constraints.weightx = 1; constraints.weighty = 1;
         constraints.gridx = 1; constraints.gridy = 6;
         constraints.gridwidth = 2;
         constraints.insets = defaultInsets;
-        displayPanel.add(credentialErrorLabel, constraints);
+        addToDisplay(credentialErrorLabel, constraints);
 
         constraints.weighty = 1;
         constraints.gridy = 7;
         constraints.insets = new Insets(defaultInsets.top*2, defaultInsets.left*5, defaultInsets.bottom*2, defaultInsets.right*5);
-        displayPanel.add(nextButton, constraints);
+        addToDisplay(nextButton, constraints);
 
         constraints.weighty = 1;
         constraints.gridy = 8;
         constraints.insets.bottom = defaultInsets.bottom*50;
-        displayPanel.add(registerButton, constraints);
+        addToDisplay(registerButton, constraints);
 
         rememberBox.setSelected(false);
         loadCredentials();
@@ -437,6 +445,7 @@ class LoginSubpage extends SubpageTemplate implements MainSubpage {
 
 class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
     private final JButton nextButton = new JButton("Next"), prevButton = new JButton("Back");
+
 
     private boolean focusedPage;
 
