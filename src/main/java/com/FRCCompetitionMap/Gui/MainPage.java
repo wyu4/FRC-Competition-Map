@@ -27,9 +27,6 @@ public class MainPage extends RoundedPanel implements SessionComponents {
     private static final Hashtable<String, Object> transferredData = new Hashtable<>();
 
     public static Object getTransferredData(String key) {
-        if (!transferredData.containsKey(key)) {
-            return "???";
-        }
         return transferredData.get(key);
     }
 
@@ -608,6 +605,8 @@ class SeasonSelectionSubpage extends SubpageTemplate implements MainSubpage {
                     String name = SeasonSummary.getSeasonName(whitelistedSeason).getParsed();
                     loadedData.put(whitelistedSeason, "[" + whitelistedSeason + "] " + name);
                     listModel.addElement(loadedData.get(whitelistedSeason));
+                    list.revalidate();
+                    list.repaint();
                 }
             } catch (Exception e) {
                 LOGGER.error("Could not load data.", e);
@@ -1014,16 +1013,16 @@ class EventSelectionSubpage extends SubpageTemplate implements MainSubpage {
                 return;
             }
             listModel.removeAllElements();
+            loadedData.clear();
             loadingJob = new LoggedThread(getClass(), () -> {
                 setLoading(true);
 
                 try {
                     ParsedTuple<List<Event>> districtEvents = DistrictEvents.getEvents(season, districtCode);
-                    districtEvents.getParsed().forEach((event) -> {
+                    for (Event event : districtEvents.getParsed()) {
                         loadedData.put(event.getCode(), event.getShortenedName());
-                        listModel.addElement(loadedData.get(event.getCode()));
-                        revalidate();
-                    });
+                    }
+                    listModel.addAll(loadedData.values());
                 } catch (Exception e) {
                     LOGGER.error("Could not load data.", e);
                 }
@@ -1040,7 +1039,7 @@ class EventSelectionSubpage extends SubpageTemplate implements MainSubpage {
     @Override
     public void update() {
         templateUpdate(() -> {
-            header.setText("Events @ %s (%s)".formatted(MainPage.getTransferredData("district_name").toString(), MainPage.getTransferredData("season").toString()));
+            header.setText("Events @ %s (%s)".formatted(String.valueOf(MainPage.getTransferredData("district_name")), String.valueOf(MainPage.getTransferredData("season"))));
             header.setFont(header.getFont().deriveFont(fontSize*0.75f));
 
             list.setFont(list.getFont().deriveFont(fontSize*0.5f));
