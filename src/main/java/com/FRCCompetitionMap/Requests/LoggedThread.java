@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LoggedThread extends Thread {
-//    private static final Logger LOGGER = LoggerFactory.getLogger(LoggedThread.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoggedThread.class);
 
     public LoggedThread(Class<?> owner, Runnable task) {
         super(task);
-        System.out.println(owner + " Create thread");
+        LOGGER.info("CREATE THREAD.");
     }
 }

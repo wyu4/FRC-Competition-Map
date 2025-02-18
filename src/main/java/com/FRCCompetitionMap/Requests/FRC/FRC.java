@@ -75,7 +75,7 @@ public class FRC {
             responseCode = 400;
             result = new StringBuilder(defaultValue);
         }
-        System.out.println("[FRC] GET REQUEST to \"" + endpoint + "\" in "  + ((System.currentTimeMillis() - startTime) / 1000f) + " seconds.");
+        LOGGER.info("[FRC] GET REQUEST to \"{}\" in {} seconds with code {}.", endpoint, (System.currentTimeMillis() - startTime) / 1000f, responseCode);
         return new RequestTuple(responseCode, result.toString());
     }
 
