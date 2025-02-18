@@ -14,11 +14,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Session extends JFrame implements ActionListener, WindowListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(Session.class);
-    private final List<SessionComponents> pages = new ArrayList<>();
+    private final List<SessionComponents> pages = Collections.synchronizedList(new ArrayList<>());
     private final MainPage mainPage;
     private final EventPage eventPage = new EventPage();
     private final GradientPanel gradientBackground = new GradientPanel();
@@ -113,7 +114,9 @@ public class Session extends JFrame implements ActionListener, WindowListener {
     }
 
     private void updateAll() {
-        pages.forEach(SessionComponents::update);
+        for (SessionComponents s : pages) {
+            s.update();
+        }
     }
 
     @Override

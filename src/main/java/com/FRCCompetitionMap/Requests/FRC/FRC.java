@@ -84,8 +84,8 @@ public class FRC {
         return results.getCode();
     }
 
-    public static RequestTuple searchPlayoffBracket(int season, String event, String defaultValue) {
-        return get("/%s/matches/%s?tournamentLevel=Playoff".formatted(season, event), defaultValue);
+    public static RequestTuple searchQualifications(int season, String event, String defaultValue) {
+        return get("/%s/matches/%s?tournamentLevel=Qualification".formatted(season, event), defaultValue);
     }
 
     public static RequestTuple searchAllianceSelection(int season, String event, String defaultValue) {

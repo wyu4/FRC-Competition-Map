@@ -1,6 +1,6 @@
 package com.FRCCompetitionMap.Requests;
 
-import com.FRCCompetitionMap.Requests.FRC.ParsedData.PlayoffMatch;
+import com.FRCCompetitionMap.Requests.FRC.ParsedData.MatchData.Match;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.io.File;
@@ -30,7 +30,7 @@ public class FRCTest {
 
 //        System.out.println(parsedFirstMatch);
 
-        PlayoffMatch playoffMatch = new PlayoffMatch(parsedFirstMatch);
+        Match playoffMatch = new Match(parsedFirstMatch);
 
 //        System.out.println(playoffMatch.getNumber());
 

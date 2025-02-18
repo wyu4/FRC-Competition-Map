@@ -2,10 +2,15 @@ package com.FRCCompetitionMap.Requests.FRC.ParsedData.EventData;
 
 import com.google.gson.internal.LinkedTreeMap;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
+
 public class Event {
     private final LinkedTreeMap<?,?> tree;
 
-    private String name, districtCode, code, compType, venue, dateStart, dateEnd, allianceCount, address, stateprov, country,  website;
+    private String name, districtCode, code, compType, venue, dateStart, dateEnd, timezone, allianceCount, address, stateprov, country,  website;
 
     public Event(LinkedTreeMap<?,?> tree) {
         this.tree = tree;
@@ -77,5 +82,20 @@ public class Event {
             website = String.valueOf(tree.get("website"));
         }
         return website;
+    }
+
+    public String getTimezone() {
+        if (timezone == null) {
+            timezone = String.valueOf(tree.get("timezone"));
+        }
+
+        return timezone;
+    }
+
+    public LocalDateTime getStartTime() {
+        if (dateStart == null) {
+            dateStart = String.valueOf(tree.get("dateStart"));
+        }
+        return LocalDateTime.parse(dateStart);
     }
 }
