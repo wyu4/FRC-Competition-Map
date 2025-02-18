@@ -14,12 +14,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Session extends JFrame implements ActionListener, WindowListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(Session.class);
-    private final List<SessionComponents> pages = new ArrayList<>();
+    private final List<SessionComponents> pages = Collections.synchronizedList(new ArrayList<>());
     private final MainPage mainPage;
+    private final EventPage eventPage = new EventPage();
     private final GradientPanel gradientBackground = new GradientPanel();
     private final Attribution attribution = new Attribution(ImageLoader.FRC_LOGO);
     private final Timer runtime;
@@ -32,10 +34,24 @@ public class Session extends JFrame implements ActionListener, WindowListener {
         super("FRC Competition Map");
         runtime = new Timer(1000/30, this);
 
-        mainPage = new MainPage(pageNumber, () -> {
-            LOGGER.debug("Last page!");
+        mainPage = new MainPage(pageNumber);
+        eventPage.setVisible(false);
+
+        mainPage.setOnEnd(() -> {
+            mainPage.focusCurrentPage(false);
+            eventPage.setFocused(true);
+            mainPage.setVisible(false);
+            eventPage.setVisible(true);
         });
+        eventPage.setOnBack(() -> {
+            mainPage.focusCurrentPage(true);
+            eventPage.setFocused(false);
+            mainPage.setVisible(true);
+            eventPage.setVisible(false);
+        });
+
         mainPage.setDoubleBuffered(true);
+        eventPage.setDoubleBuffered(true);
 
         JFrame.setDefaultLookAndFeelDecorated(false);
         setLayout(null);
@@ -47,6 +63,7 @@ public class Session extends JFrame implements ActionListener, WindowListener {
 
         gradientBackground.setLocation(0, 0);
 
+        add(eventPage);
         add(mainPage);
         add(attribution);
         add(gradientBackground);
@@ -97,7 +114,9 @@ public class Session extends JFrame implements ActionListener, WindowListener {
     }
 
     private void updateAll() {
-        pages.forEach(SessionComponents::update);
+        for (SessionComponents s : pages) {
+            s.update();
+        }
     }
 
     @Override
@@ -105,6 +124,9 @@ public class Session extends JFrame implements ActionListener, WindowListener {
         if (e.getSource().equals(runtime)) {
             mainPage.setSize(getWidth()/4, getWidth()/4);
             mainPage.setLocation(SessionUtils.calculateCenterLocation(this, mainPage));
+
+            eventPage.setSize(getWidth(), getHeight());
+            eventPage.setLocation(0, 0);
 
             attribution.setSize((int)(mainPage.getWidth()*0.75f), (getHeight()-mainPage.getY()-mainPage.getHeight())/2);
             attribution.setLocation(SessionUtils.calculateCenterLocation(this, attribution).x, mainPage.getY() + mainPage.getHeight());

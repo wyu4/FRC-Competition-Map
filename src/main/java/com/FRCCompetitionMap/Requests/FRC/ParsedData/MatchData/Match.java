@@ -1,4 +1,4 @@
-package com.FRCCompetitionMap.Requests.FRC.ParsedData;
+package com.FRCCompetitionMap.Requests.FRC.ParsedData.MatchData;
 
 import com.FRCCompetitionMap.Requests.DataParser;
 import com.google.gson.internal.LinkedTreeMap;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class PlayoffMatch {
+public class Match {
     public enum AllianceType {
         BLUE, RED
     }
@@ -16,13 +16,13 @@ public class PlayoffMatch {
         BLUE, RED, TIE
     }
 
-    private Integer matchNumber = null, roundNumber = null;
-    private String description = null;
-    private WinnerType winner = null;
+    private Integer matchNumber, scoreRed, scoreBlue;
+    private String description;
+    private WinnerType winner;
     private final LinkedTreeMap<?, ?> tree;
     private final HashMap<AllianceType, List<Integer>> alliances = new HashMap<>();
 
-    public PlayoffMatch(LinkedTreeMap<?, ?> tree) {
+    public Match(LinkedTreeMap<?, ?> tree) {
         this.tree = tree;
     }
 
@@ -34,16 +34,6 @@ public class PlayoffMatch {
             }
         }
         return matchNumber;
-    }
-
-    public Integer getRoundNumber() {
-        if (roundNumber == null) {
-            String desc = getDescription();
-            if (desc != null) {
-                
-            }
-        }
-        return roundNumber;
     }
 
     public String getDescription() {
@@ -87,6 +77,24 @@ public class PlayoffMatch {
             }
         }
         return alliances.get(alliance);
+    }
+
+    public Integer getScore(AllianceType alliance) {
+        if (alliance == AllianceType.BLUE) {
+            if (scoreBlue == null) {
+                if (tree.get("scoreBlueFinal") instanceof Double score) {
+                    scoreBlue = score.intValue();
+                }
+            }
+            return scoreBlue;
+        } else {
+            if (scoreRed == null) {
+                if (tree.get("scoreRedFinal") instanceof Double score) {
+                    scoreRed = score.intValue();
+                }
+            }
+            return scoreRed;
+        }
     }
 
     public WinnerType getWinner() {

@@ -35,6 +35,8 @@ public class MainPage extends RoundedPanel implements SessionComponents {
 
     private volatile MainSubpage currentSubpage;
 
+    private Runnable onEnd;
+
     private final JLabel header = new JLabel("HEADER");
     private final List<MainSubpage> subpages = List.of(
             new LoginSubpage(),
@@ -42,15 +44,13 @@ public class MainPage extends RoundedPanel implements SessionComponents {
             new EventFilterSubpage(),
             new EventSelectionSubpage()
     );
-    private final Runnable onEnd;
 
-    public MainPage(Runnable onEnd) {
-        this(0, onEnd);
+    public MainPage() {
+        this(0);
     }
 
-    public MainPage(int startPage, Runnable onEnd) {
+    public MainPage(int startPage) {
         super();
-        this.onEnd = onEnd;
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -83,7 +83,10 @@ public class MainPage extends RoundedPanel implements SessionComponents {
                         return;
                     }
                     if (isLastPage()) {
-                        onEnd.run();
+                        currentSubpage.setFocusedPage(false);
+                        if (onEnd != null) {
+                            onEnd.run();
+                        }
                         return;
                     }
                     nextPage();
@@ -93,6 +96,10 @@ public class MainPage extends RoundedPanel implements SessionComponents {
         });
         setPage(subpages.get(startPage));
         add(new JButton());
+    }
+
+    public void setOnEnd(Runnable onEnd) {
+        this.onEnd = onEnd;
     }
 
     private boolean isFirstPage() {
@@ -109,6 +116,10 @@ public class MainPage extends RoundedPanel implements SessionComponents {
 
     private void prevPage() {
         setPage(subpages.get(subpages.indexOf(currentSubpage) - 1));
+    }
+
+    public void focusCurrentPage(boolean focus) {
+        currentSubpage.setFocusedPage(focus);
     }
 
     private void setPage(MainSubpage page) {
@@ -842,7 +853,7 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
 
         constraints.gridy = 3;
         constraints.weighty = 0.1;
-        constraints.insets = new Insets(defaultInsets.top, defaultInsets.left*10, defaultInsets.bottom*4, defaultInsets.right*10);
+        constraints.insets = new Insets(defaultInsets.top, defaultInsets.left*5, defaultInsets.bottom*4, defaultInsets.right*5);
         addToDisplay(prevButton, constraints);
 
         revalidate();

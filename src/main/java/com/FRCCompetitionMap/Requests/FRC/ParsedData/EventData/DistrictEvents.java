@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-public class DistrictEvents {
+public abstract class DistrictEvents {
     private static final Hashtable<String, String> cache = new Hashtable<>();
 
     public static ParsedTuple<List<Event>> getEvents(int season, String district) {

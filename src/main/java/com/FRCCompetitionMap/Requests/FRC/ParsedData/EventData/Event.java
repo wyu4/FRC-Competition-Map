@@ -2,10 +2,15 @@ package com.FRCCompetitionMap.Requests.FRC.ParsedData.EventData;
 
 import com.google.gson.internal.LinkedTreeMap;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
+
 public class Event {
     private final LinkedTreeMap<?,?> tree;
 
-    private String name, districtCode, code, compType, venue, dateStart, dateEnd, allianceCount, address, stateprov, country,  website;
+    private String name, districtCode, code, compType, venue, dateStart, dateEnd, timezone, allianceCount, address, stateprov, country,  website;
 
     public Event(LinkedTreeMap<?,?> tree) {
         this.tree = tree;
@@ -50,5 +55,47 @@ public class Event {
             allianceCount = String.valueOf(tree.get("allianceCount"));
         }
         return allianceCount;
+    }
+
+    public String getVenue() {
+        if (venue == null) {
+            venue = String.valueOf(tree.get("venue"));
+        }
+        return venue;
+    }
+
+    public String getFullAddress() {
+        if (address == null) {
+            address = String.valueOf(tree.get("address"));
+        }
+        if (stateprov == null) {
+            stateprov = String.valueOf(tree.get("stateprov"));
+        }
+        if (country == null) {
+            country = String.valueOf(tree.get("country"));
+        }
+        return address + ", " + stateprov + ", " + country;
+    }
+
+    public String getWebsite() {
+        if (website == null) {
+            website = String.valueOf(tree.get("website"));
+        }
+        return website;
+    }
+
+    public String getTimezone() {
+        if (timezone == null) {
+            timezone = String.valueOf(tree.get("timezone"));
+        }
+
+        return timezone;
+    }
+
+    public LocalDateTime getStartTime() {
+        if (dateStart == null) {
+            dateStart = String.valueOf(tree.get("dateStart"));
+        }
+        return LocalDateTime.parse(dateStart);
     }
 }
