@@ -34,7 +34,8 @@ public class EventPage extends RoundedPanel implements SessionComponents {
     public EventPage() {
         super();
 
-        setLayout(new GridLayout(1, 2));
+//        setLayout(new GridLayout(1, 2));
+        setLayout(null);
         setBackground(UIManager.getColor("background.subpage"));
 
         infoPanel.setBackground(getBackground());
@@ -133,7 +134,7 @@ public class EventPage extends RoundedPanel implements SessionComponents {
         infoPanel.add(matchPanel);
 
         add(infoPanel);
-        add(scrollPane);
+//        add(scrollPane);
     }
 
     public void setFocused(boolean focused) {
@@ -167,6 +168,9 @@ public class EventPage extends RoundedPanel implements SessionComponents {
             return;
         }
 
+        infoPanel.setSize(getSize());
+        infoPanel.setLocation(0, 0);
+
         backButton.setSize((int)(infoPanel.getWidth()*0.05f), (int)(infoPanel.getWidth()*0.05f));
         backButton.setLocation((int)(infoPanel.getWidth()*0.025f), (int)(infoPanel.getWidth()*0.025f));
         headerPanel.setSize((int)(infoPanel.getWidth()*0.95f), infoPanel.getHeight()/2);
@@ -174,7 +178,7 @@ public class EventPage extends RoundedPanel implements SessionComponents {
         matchPanel.setSize(infoPanel.getWidth(), infoPanel.getHeight() - (headerPanel.getHeight() + headerPanel.getY()));
         matchPanel.setLocation(0, headerPanel.getY() + headerPanel.getHeight());
 
-        final float fontSize = headerPanel.getWidth()*0.05f;
+        final float fontSize = headerPanel.getWidth()*0.04f;
 
         backButton.setFont(backButton.getFont().deriveFont(fontSize));
         districtHeader.setFont(districtHeader.getFont().deriveFont(fontSize*0.9f));
