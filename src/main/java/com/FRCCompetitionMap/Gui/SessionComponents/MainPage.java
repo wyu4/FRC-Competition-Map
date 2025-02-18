@@ -1,7 +1,8 @@
-package com.FRCCompetitionMap.Gui;
+package com.FRCCompetitionMap.Gui.SessionComponents;
 
 import com.FRCCompetitionMap.Encryption.AES;
 import com.FRCCompetitionMap.Gui.CustomComponents.RoundedPanel;
+import com.FRCCompetitionMap.Gui.SessionUtils;
 import com.FRCCompetitionMap.Requests.FRC.FRC;
 import com.FRCCompetitionMap.Requests.FRC.ParsedData.DistrictData.District;
 import com.FRCCompetitionMap.Requests.FRC.ParsedData.DistrictData.SeasonDistricts;

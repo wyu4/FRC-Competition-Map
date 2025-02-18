@@ -1,10 +1,9 @@
 package com.FRCCompetitionMap;
 
-import com.FRCCompetitionMap.Gui.MainPage;
+import com.FRCCompetitionMap.Gui.SessionComponents.MainPage;
 import com.FRCCompetitionMap.Gui.Session;
 import com.FRCCompetitionMap.Requests.FRC.ParsedData.DistrictData.SeasonDistricts;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -1,8 +1,6 @@
 package com.FRCCompetitionMap.Requests.FRC;
 
 import com.FRCCompetitionMap.Requests.RequestTuple;
-import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,13 +10,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Base64;
 
 /**
  * Class that handles HTTP Requests to the FRC API.
  */
-public class FRC {
+public abstract class FRC {
     public static final String API_REGISTRATION = "https://frc-events.firstinspires.org/services/api/register";
     private static final Logger LOGGER = LoggerFactory.getLogger(FRC.class);
     private static final String API = "https://frc-api.firstinspires.org/v3.0";

@@ -1,4 +1,4 @@
-package com.FRCCompetitionMap.Gui;
+package com.FRCCompetitionMap.Gui.SessionComponents;
 
 import com.FRCCompetitionMap.Gui.CustomComponents.SmartImageIcon;
 import com.FRCCompetitionMap.IO.ImageLoader;

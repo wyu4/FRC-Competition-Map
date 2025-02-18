@@ -1,6 +1,10 @@
 package com.FRCCompetitionMap.Gui;
 
 import com.FRCCompetitionMap.Gui.CustomComponents.GradientPanel;
+import com.FRCCompetitionMap.Gui.SessionComponents.Attribution;
+import com.FRCCompetitionMap.Gui.SessionComponents.EventPage;
+import com.FRCCompetitionMap.Gui.SessionComponents.MainPage;
+import com.FRCCompetitionMap.Gui.SessionComponents.SessionComponents;
 import com.FRCCompetitionMap.Gui.Themes.ThemeDark;
 import com.FRCCompetitionMap.IO.ImageLoader;
 import com.formdev.flatlaf.FlatLaf;
