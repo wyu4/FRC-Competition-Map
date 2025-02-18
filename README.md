@@ -12,23 +12,24 @@ Maps out the current team hierarchy of FRC competitions. This was made for the I
 ├───.github
 │   └───workflows
 │           maven-build.yaml
-│
-├───.idea
+|
 ├───src
 │   ├───main
 │   │   ├───java
 │   │   │   └───com
 │   │   │       └───FRCCompetitionMap
+│   │   │           │   ignore.java
 │   │   │           │   Start.java
+│   │   │           │   TestStart.java
 │   │   │           │
 │   │   │           ├───Encryption
 │   │   │           │       AES.java
 │   │   │           │
 │   │   │           ├───Gui
-│   │   │           │   │   FIRSTAttribution.java
+│   │   │           │   │   Attribution.java
 │   │   │           │   │   MainPage.java
 │   │   │           │   │   Session.java
-│   │   │           │   │   SessionPage.java
+│   │   │           │   │   SessionComponents.java
 │   │   │           │   │   SessionUtils.java
 │   │   │           │   │
 │   │   │           │   ├───CustomComponents
@@ -45,8 +46,8 @@ Maps out the current team hierarchy of FRC competitions. This was made for the I
 │   │   │           └───Requests
 │   │   │               │   DataParser.java
 │   │   │               │   FRCTest.java
-│   │   │               │   ignore.java
-│   │   │               │   RequestTest.java
+│   │   │               │   LoggedThread.java
+│   │   │               │   RequestTuple.java
 │   │   │               │
 │   │   │               ├───Callbacks
 │   │   │               │       BooleanCallback.java
@@ -55,7 +56,17 @@ Maps out the current team hierarchy of FRC competitions. This was made for the I
 │   │   │               │   │   FRC.java
 │   │   │               │   │
 │   │   │               │   └───ParsedData
-│   │   │               │           PlayoffMatch.java
+│   │   │               │       │   ParsedTuple.java
+│   │   │               │       │   PlayoffMatch.java
+│   │   │               │       │   SeasonSummary.java
+│   │   │               │       │
+│   │   │               │       ├───DistrictData
+│   │   │               │       │       District.java
+│   │   │               │       │       SeasonDistricts.java
+│   │   │               │       │
+│   │   │               │       └───EventData
+│   │   │               │               DistrictEvents.java
+│   │   │               │               Event.java
 │   │   │               │
 │   │   │               └───TBA
 │   │   │                   │   TBA.java
@@ -73,7 +84,6 @@ Maps out the current team hierarchy of FRC competitions. This was made for the I
 │   └───test
 │       ├───java
 │       └───resources
-
 ```
 Generated using the following command:
 ```bash
