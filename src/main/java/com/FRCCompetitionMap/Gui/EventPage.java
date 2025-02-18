@@ -25,8 +25,8 @@ public class EventPage extends RoundedPanel implements SessionComponents {
             websiteHeader = new JLabel("Website:"),
             codeLabel = new JLabel("???"),
             venueLabel = new JLabel("???"),
-            locationLabel = new JLabel("???"),
-            websiteLabel = new JLabel("???");
+            locationLabel = new JLabel("???");
+    private final JButton websiteLabel = new JButton("???");
 
     private Runnable onBack;
     private boolean focused = false;
@@ -43,12 +43,21 @@ public class EventPage extends RoundedPanel implements SessionComponents {
         scrollPane.getViewport().setView(matchPanel);
 
         eventHeader.setFont(eventHeader.getFont().deriveFont(Font.BOLD));
-        districtHeader.setFont(districtHeader.getFont().deriveFont(Font.BOLD));
+        districtHeader.setFont(districtHeader.getFont().deriveFont(Font.ITALIC));
         backButton.setFont(backButton.getFont().deriveFont(Font.BOLD));
         backButton.addActionListener((e) -> {
             if (focused && onBack != null) {
                 onBack.run();
             }
+        });
+
+        websiteLabel.setBackground(UIManager.getColor("background.subpage"));
+        websiteLabel.setFocusPainted(false);
+        websiteLabel.setFocusable(false);
+        websiteLabel.addActionListener((e) -> {
+            try {
+                SessionUtils.openLink(websiteLabel.getText());
+            } catch (Exception ignore) {}
         });
 
         backButton.setHorizontalAlignment(SwingConstants.CENTER);
@@ -81,9 +90,9 @@ public class EventPage extends RoundedPanel implements SessionComponents {
 
         //////////////////////////////////////////////////////////////////////////////
         // Subheaders
-        constraints.weighty = 0.8;
+        constraints.weightx = 2; constraints.weighty = 0.8;
         constraints.gridx = 1; constraints.gridy = 2;
-        constraints.insets = new Insets(0, defaultInset.left, 0, defaultInset.right/2);
+        constraints.insets = new Insets(0, 0, 0, defaultInset.right/2);
         headerPanel.add(codeHeader, constraints);
 
         constraints.weighty = 0.8;
@@ -101,7 +110,7 @@ public class EventPage extends RoundedPanel implements SessionComponents {
 
         //////////////////////////////////////////////////////////////////////////////
         // Contents
-        constraints.weighty = 0.8f;
+        constraints.weightx = 0.1; constraints.weighty = 0.8f;
         constraints.gridx = 2; constraints.gridy = 2;
         constraints.insets = new Insets(0, defaultInset.left/2, 0, defaultInset.right);
         headerPanel.add(codeLabel, constraints);
@@ -160,7 +169,7 @@ public class EventPage extends RoundedPanel implements SessionComponents {
 
         backButton.setSize((int)(infoPanel.getWidth()*0.05f), (int)(infoPanel.getWidth()*0.05f));
         backButton.setLocation((int)(infoPanel.getWidth()*0.025f), (int)(infoPanel.getWidth()*0.025f));
-        headerPanel.setSize((int)(infoPanel.getWidth()*0.9f), infoPanel.getHeight()/2);
+        headerPanel.setSize((int)(infoPanel.getWidth()*0.95f), infoPanel.getHeight()/2);
         headerPanel.setLocation(infoPanel.getWidth() - headerPanel.getWidth(), 0);
         matchPanel.setSize(infoPanel.getWidth(), infoPanel.getHeight() - (headerPanel.getHeight() + headerPanel.getY()));
         matchPanel.setLocation(0, headerPanel.getY() + headerPanel.getHeight());
@@ -168,7 +177,7 @@ public class EventPage extends RoundedPanel implements SessionComponents {
         final float fontSize = headerPanel.getWidth()*0.05f;
 
         backButton.setFont(backButton.getFont().deriveFont(fontSize));
-        districtHeader.setFont(districtHeader.getFont().deriveFont(fontSize));
+        districtHeader.setFont(districtHeader.getFont().deriveFont(fontSize*0.9f));
         eventHeader.setFont(eventHeader.getFont().deriveFont(fontSize*0.6f));
         codeHeader.setFont(codeHeader.getFont().deriveFont(fontSize*0.5f)); codeLabel.setFont(codeHeader.getFont());
         venueHeader.setFont(venueHeader.getFont().deriveFont(fontSize*0.5f)); venueLabel.setFont(venueHeader.getFont());
