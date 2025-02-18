@@ -3,9 +3,8 @@ package com.FRCCompetitionMap.Gui;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 
-public class SessionUtils {
+public abstract class SessionUtils {
     public static final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private static final Desktop DESKTOP = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
 

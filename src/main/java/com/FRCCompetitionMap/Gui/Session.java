@@ -37,6 +37,7 @@ public class Session extends JFrame implements ActionListener, WindowListener {
     public Session(int pageNumber) {
         super("FRC Competition Map");
         runtime = new Timer(1000/30, this);
+        AnimationHandler.setDelta(runtime.getDelay());
 
         mainPage = new MainPage(pageNumber);
         eventPage.setVisible(false);

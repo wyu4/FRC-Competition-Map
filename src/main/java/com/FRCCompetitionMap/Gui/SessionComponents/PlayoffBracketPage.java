@@ -1,5 +1,7 @@
 package com.FRCCompetitionMap.Gui.SessionComponents;
 
-public class PlayoffBracketPage {
+import javax.swing.JPanel;
+
+public class PlayoffBracketPage extends JPanel {
 
 }
