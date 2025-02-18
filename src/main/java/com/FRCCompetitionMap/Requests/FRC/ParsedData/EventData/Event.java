@@ -51,4 +51,31 @@ public class Event {
         }
         return allianceCount;
     }
+
+    public String getVenue() {
+        if (venue == null) {
+            venue = String.valueOf(tree.get("venue"));
+        }
+        return venue;
+    }
+
+    public String getFullAddress() {
+        if (address == null) {
+            address = String.valueOf(tree.get("address"));
+        }
+        if (stateprov == null) {
+            stateprov = String.valueOf(tree.get("stateprov"));
+        }
+        if (country == null) {
+            country = String.valueOf(tree.get("country"));
+        }
+        return address + ", " + stateprov + ", " + country;
+    }
+
+    public String getWebsite() {
+        if (website == null) {
+            website = String.valueOf(tree.get("website"));
+        }
+        return website;
+    }
 }
