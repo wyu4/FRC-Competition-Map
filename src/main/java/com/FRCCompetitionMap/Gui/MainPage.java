@@ -13,7 +13,6 @@ import com.FRCCompetitionMap.Requests.LoggedThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -722,6 +721,9 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
         }
 
         public void update() {
+            if (getParent() == null) {
+                return;
+            }
             final float fontSize = getWidth()*0.075f;
             header.setFont(header.getFont().deriveFont(fontSize));
             codeHeader.setFont(header.getFont().deriveFont(fontSize));
@@ -747,8 +749,8 @@ class EventFilterSubpage extends SubpageTemplate implements MainSubpage{
 
     private static class DistrictScrollPane extends JScrollPane {
         private final JPanel contentPane = new JPanel(null);
-        private final List<DistrictPanel> districtPanels = new ArrayList<>();
-        private final List<ActionListener> selectionListeners = new ArrayList<>();
+        private final List<DistrictPanel> districtPanels = Collections.synchronizedList(new ArrayList<>());
+        private final List<ActionListener> selectionListeners = Collections.synchronizedList(new ArrayList<>());
 
         public DistrictScrollPane() {
             setDoubleBuffered(true);
@@ -940,6 +942,7 @@ class EventSelectionSubpage extends SubpageTemplate implements MainSubpage {
     private final JButton prevButton = new JButton("Back"), viewButton = new JButton("View");
 
     private final Hashtable<String, String> loadedData = new Hashtable<>();
+    private final Hashtable<String, Event> loadedRawData = new Hashtable<>();
 
     private final DefaultListModel<String> listModel = new DefaultListModel<>();
     private final JList<String> list = new JList<>(listModel);
@@ -1021,6 +1024,7 @@ class EventSelectionSubpage extends SubpageTemplate implements MainSubpage {
                     ParsedTuple<List<Event>> districtEvents = DistrictEvents.getEvents(season, districtCode);
                     for (Event event : districtEvents.getParsed()) {
                         loadedData.put(event.getCode(), event.getShortenedName());
+                        loadedRawData.put(event.getCode(), event);
                     }
                     listModel.addAll(loadedData.values());
                 } catch (Exception e) {
@@ -1082,7 +1086,7 @@ class EventSelectionSubpage extends SubpageTemplate implements MainSubpage {
     @Override
     public void canMoveOn(Runnable onSuccess) {
         if (selectedCompetition != null) {
-            MainPage.setTransferredData("event", selectedCompetition);
+            MainPage.setTransferredData("event", loadedRawData.get(selectedCompetition));
             onSuccess.run();
         }
     }
