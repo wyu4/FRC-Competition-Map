@@ -1081,6 +1081,8 @@ class EventSelectionSubpage extends SubpageTemplate implements MainSubpage {
         focusedPage = focused;
         if (focused) {
             load();
+            selectedCompetition = null;
+            viewButton.setEnabled(false);
         }
     }
 
