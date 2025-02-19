@@ -85,8 +85,8 @@ public abstract class FRC {
         return get("/%s/matches/%s?tournamentLevel=Qualification".formatted(season, event), defaultValue);
     }
 
-    public static RequestTuple searchAllianceSelection(int season, String event, String defaultValue) {
-        return get("/%s/alliances/%s".formatted(season, event), defaultValue);
+    public static RequestTuple searchTeams(int season, String event, String defaultValue) {
+        return get("/%s/teams?teamNumber=&eventCode=%s".formatted(season, event), defaultValue);
     }
 
     public static RequestTuple searchDistricts(int season, String defaultValue) {
