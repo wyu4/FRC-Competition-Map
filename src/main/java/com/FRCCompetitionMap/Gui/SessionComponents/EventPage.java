@@ -20,7 +20,7 @@ public class EventPage extends RoundedPanel implements SessionComponents {
 
     private final JPanel infoPanel = new JPanel(null), headerPanel = new JPanel(new GridBagLayout());
     private final JButton backButton = new JButton("<");
-    private final MatchPanel matchPanel = new MatchPanel();
+    private final QualificationPanel qualificationPanel = new QualificationPanel();
 
     private final JLabel
             eventHeader = new JLabel("Event"),
@@ -136,7 +136,7 @@ public class EventPage extends RoundedPanel implements SessionComponents {
 
         infoPanel.add(backButton);
         infoPanel.add(headerPanel);
-        infoPanel.add(matchPanel);
+        infoPanel.add(qualificationPanel);
 
         add(infoPanel);
 //        add(scrollPane);
@@ -168,27 +168,27 @@ public class EventPage extends RoundedPanel implements SessionComponents {
             }
 
             loadTask = new LoggedThread(getClass(), () -> {
-                matchPanel.setLoading(true);
+                qualificationPanel.setLoading(true);
                 try {
                     ParsedTuple<List<Match>> matches = EventMatches.getMatches(event);
 
                     if (Thread.currentThread().isInterrupted()) {
-                        matchPanel.setLoading(false);
+                        qualificationPanel.setLoading(false);
                         Thread.currentThread().interrupt();
                         return;
                     }
 
-                    matchPanel.clearDisplays();
+                    qualificationPanel.clearDisplays();
                     for (Match match : matches.getParsed()) {
                         if (Thread.currentThread().isInterrupted()) {
                             break;
                         }
-                        matchPanel.addDisplay(match);
+                        qualificationPanel.addDisplay(match);
                     }
                 } catch (Exception e) {
                     LOGGER.error("Could not complete loading job.", e);
                 }
-                matchPanel.setLoading(false);
+                qualificationPanel.setLoading(false);
                 Thread.currentThread().interrupt();
             });
             loadTask.start();
@@ -211,8 +211,8 @@ public class EventPage extends RoundedPanel implements SessionComponents {
         backButton.setLocation((int)(infoPanel.getWidth()*0.025f), (int)(infoPanel.getWidth()*0.025f));
         headerPanel.setSize((int)(infoPanel.getWidth()*0.95f), infoPanel.getHeight()/2);
         headerPanel.setLocation(infoPanel.getWidth() - headerPanel.getWidth(), 0);
-        matchPanel.setSize(infoPanel.getWidth(), infoPanel.getHeight() - (headerPanel.getHeight() + headerPanel.getY()));
-        matchPanel.setLocation(0, headerPanel.getY() + headerPanel.getHeight());
+        qualificationPanel.setSize(infoPanel.getWidth(), infoPanel.getHeight() - (headerPanel.getHeight() + headerPanel.getY()));
+        qualificationPanel.setLocation(0, headerPanel.getY() + headerPanel.getHeight());
 
         final float fontSize = headerPanel.getWidth()*0.04f;
 
@@ -226,11 +226,11 @@ public class EventPage extends RoundedPanel implements SessionComponents {
 
         locationHeader.setFont(locationHeader.getFont().deriveFont(fontSize));
 
-        matchPanel.update();
+        qualificationPanel.update();
     }
 }
 
-class MatchPanel extends JPanel {
+class QualificationPanel extends JPanel {
     private final List<MatchDisplay> displays = new ArrayList<>();
 
     private final JPanel scrollPaneView;
@@ -238,7 +238,7 @@ class MatchPanel extends JPanel {
     private final JPanel loadingPanel = new JPanel(null);
     private final JLabel loadingLabel = new JLabel("Loading Matches...");
 
-    public MatchPanel() {
+    public QualificationPanel() {
         super(null);
 
         scrollPaneView = new JPanel(null);
